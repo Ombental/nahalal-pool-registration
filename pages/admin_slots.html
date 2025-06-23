@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Time Slots | Nahalal Pool Registration</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #222;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 900px;
+        margin: 60px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 36px 28px;
+      }
+      h2 {
+        color: #e67e22;
+        text-align: center;
+      }
+      form {
+        margin-bottom: 32px;
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button,
+      .action-btn {
+        background: #e67e22;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 14px;
+        cursor: pointer;
+        margin-right: 6px;
+      }
+      .action-btn.delete {
+        background: #d32f2f;
+      }
+      .action-btn.publish {
+        background: #388e3c;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 24px;
+      }
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+      }
+      th {
+        background: #f4f4f4;
+      }
+      .feedback {
+        text-align: center;
+        margin-top: 16px;
+        font-weight: bold;
+      }
+      .error {
+        color: #d32f2f;
+      }
+      .success {
+        color: #388e3c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Manage Time Slots</h2>
+      <form id="slot-form">
+        <label for="slot-date">Date</label>
+        <input type="date" id="slot-date" required />
+        <label for="slot-start">Start Time</label>
+        <input type="time" id="slot-start" required />
+        <label for="slot-end">End Time</label>
+        <input type="time" id="slot-end" required />
+        <label for="slot-max">Max Participants</label>
+        <input type="number" id="slot-max" min="1" required />
+        <label for="slot-group">Time Group</label>
+        <input type="text" id="slot-group" required />
+        <button type="submit">Add Time Slot</button>
+        <div class="feedback" id="form-feedback"></div>
+      </form>
+      <div id="slots-table-container">
+        <!-- Table will be populated by JS -->
+      </div>
+      <div style="text-align: center; margin-top: 20px">
+        <a href="admin.html">Back to Admin Home</a> |
+        <a href="../index.html">App Entry</a>
+      </div>
+    </div>
+    <script src="../vendor/supabase.js"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin_slots.js"></script>
+  </body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Reports | Nahalal Pool Registration</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #222;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 900px;
+        margin: 60px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 36px 28px;
+      }
+      h2 {
+        color: #e67e22;
+        text-align: center;
+      }
+      .report-section {
+        margin-bottom: 36px;
+      }
+      button {
+        background: #e67e22;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 14px;
+        cursor: pointer;
+        margin-bottom: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+      }
+      th {
+        background: #f4f4f4;
+      }
+      .feedback {
+        text-align: center;
+        margin-top: 16px;
+        font-weight: bold;
+      }
+      .error {
+        color: #d32f2f;
+      }
+      .success {
+        color: #388e3c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Admin Reports</h2>
+      <div class="report-section">
+        <h3>All Current Registrations</h3>
+        <button id="export-registrations-btn">Export as CSV</button>
+        <div id="registrations-table-container">
+          <!-- Table will be populated by JS -->
+        </div>
+      </div>
+      <div class="report-section">
+        <h3>Users Registered Twice in the Same Time Group</h3>
+        <button id="export-duplicates-btn">Export as CSV</button>
+        <div id="duplicates-table-container">
+          <!-- Table will be populated by JS -->
+        </div>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <div style="text-align: center; margin-top: 20px">
+        <a href="admin.html">Back to Admin Home</a> |
+        <a href="../index.html">App Entry</a>
+      </div>
+    </div>
+    <script src="../vendor/supabase.js"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin_reports.js"></script>
+  </body>
+</html>

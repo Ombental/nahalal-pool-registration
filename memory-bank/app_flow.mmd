@@ -1,0 +1,26 @@
+flowchart TD
+  subgraph Authentication
+    Login["Login Screen"]
+    Login -- Regular User (email) --> Home["Home Screen"]
+    Login -- Admin (username+password) --> AdminHome["Admin Home"]
+  end
+
+  subgraph RegularUser
+    Home -- "Register for Slot" --> Form["Registration Form (placeholder)"]
+    Home -- "My Registrations" --> MyRegs["Previous Registrations"]
+    Home -- "View All Slots" --> TableView["General Shared Table View"]
+    MyRegs -- "Cancel Future Registration" --> MyRegs
+    TableView -- "See Slot Details" --> TableView
+  end
+
+  subgraph Admin
+    AdminHome -- "Define/Edit Time Slots" --> SlotMgmt["Admin: Time Slot Management"]
+    AdminHome -- "Upload/Edit User List" --> UserMgmt["Admin: User List Management"]
+    AdminHome -- "View/Export Reports" --> Reports["Admin: Reports (placeholder)"]
+    AdminHome -- "Go to Home" --> Home
+    SlotMgmt -- "Publish Slots" --> SlotMgmt
+    UserMgmt -- "Upload CSV/List" --> UserMgmt
+    Reports -- "Export/Download" --> Reports
+  end
+
+  Form -- "Submit Registration" --> Home 

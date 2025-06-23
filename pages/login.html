@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Nahalal Pool Registration</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #222;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 400px;
+        margin: 60px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 32px 24px;
+      }
+      h2 {
+        color: #2a7ae2;
+        text-align: center;
+      }
+      form {
+        margin-bottom: 24px;
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #2a7ae2;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 1em;
+        cursor: pointer;
+      }
+      .error {
+        color: #d32f2f;
+        margin-bottom: 12px;
+        text-align: center;
+      }
+      .switch {
+        text-align: center;
+        margin-top: 8px;
+      }
+      .switch a {
+        color: #2a7ae2;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2 id="login-title">Login</h2>
+      <form id="regular-login-form">
+        <label for="regular-email">Email</label>
+        <input type="email" id="regular-email" required />
+        <button type="submit">Login as Regular User</button>
+        <div class="error" id="regular-error"></div>
+      </form>
+      <form id="admin-login-form" style="display: none">
+        <label for="admin-username">Admin Username</label>
+        <input type="text" id="admin-username" required />
+        <label for="admin-password">Password</label>
+        <input type="password" id="admin-password" required />
+        <button type="submit">Login as Admin</button>
+        <div class="error" id="admin-error"></div>
+      </form>
+      <div class="switch">
+        <span id="switch-to-admin">Admin? <a>Login here</a></span>
+        <span id="switch-to-regular" style="display: none"
+          >Regular user? <a>Login here</a></span
+        >
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 20px">
+      <a href="../index.html">Back to App Entry</a>
+    </div>
+    <script src="../vendor/supabase.js"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/login.js"></script>
+  </body>
+</html>

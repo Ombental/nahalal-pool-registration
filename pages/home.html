@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home | Nahalal Pool Registration</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #222;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 500px;
+        margin: 60px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 40px 30px;
+        text-align: center;
+      }
+      h2 {
+        color: #2a7ae2;
+      }
+      .user-info {
+        margin-bottom: 24px;
+      }
+      .nav-btn {
+        display: block;
+        width: 100%;
+        margin: 12px 0;
+        padding: 12px;
+        background: #2a7ae2;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 1.1em;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .admin-link {
+        background: #e67e22;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Welcome to Nahalal Pool Registration</h2>
+      <div class="user-info" id="user-info">
+        <!-- User info will be populated by JS -->
+      </div>
+      <a href="registration.html" class="nav-btn">Register for a Time Slot</a>
+      <a href="registrations.html" class="nav-btn">My Registrations</a>
+      <a href="table.html" class="nav-btn">View All Time Slots</a>
+      <a
+        href="admin.html"
+        class="nav-btn admin-link"
+        id="admin-link"
+        style="display: none"
+        >Go to Admin Area</a
+      >
+      <div style="text-align: center; margin-top: 20px">
+        <a href="../index.html">Back to App Entry</a>
+      </div>
+    </div>
+    <script src="../vendor/supabase.js"></script>
+    <script src="../js/supabaseClient.js"></script>
+    <script src="../js/session.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/home.js"></script>
+  </body>
+</html>

@@ -1,22 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nahalal Pool Registration</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f4; color: #222; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 80px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 40px 30px; text-align: center; }
-        h1 { color: #2a7ae2; }
-        p { font-size: 1.2em; }
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #222;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 80px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 40px 30px;
+        text-align: center;
+      }
+      h1 {
+        color: #2a7ae2;
+      }
+      p {
+        font-size: 1.2em;
+      }
     </style>
-</head>
-<body>
+    <!-- Example: <link rel="stylesheet" href="../css/main.css"> -->
+  </head>
+  <body>
     <div class="container">
-        <h1>Welcome to Nahalal Pool Registration</h1>
-        <p>This is a placeholder landing page for the project.<br>
-        Stay tuned for updates!</p>
-        <p><em>Deployed with GitHub Pages</em></p>
+      <h1>Welcome to Nahalal Pool Registration</h1>
+      <p>
+        This is a placeholder landing page for the project.<br />
+        Stay tuned for updates!
+      </p>
+      <p><em>Deployed with GitHub Pages</em></p>
     </div>
-</body>
-</html> 
+    <script src="vendor/supabase.js"></script>
+    <script>
+      // TODO: Replace with your actual Supabase URL and anon key
+      const SUPABASE_URL = "https://ajoipxispnkoussptzfp.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqb2lweGlzcG5rb3Vzc3B0emZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2NzU1MjAsImV4cCI6MjA2NjI1MTUyMH0.2Mm4tkKZfcXA6_TGNtr-k-4C-CTEXAq17x7OSUZ56p8";
+      const supabase = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          window.location.href = "pages/home.html";
+        } else {
+          window.location.href = "pages/login.html";
+        }
+      });
+    </script>
+    <!-- Example: <script src="../js/index.js"></script> -->
+  </body>
+</html>
