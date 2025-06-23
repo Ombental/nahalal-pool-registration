@@ -12,19 +12,6 @@ if (!window.nahalalSession.isLoggedIn()) {
 const user = window.nahalalSession.getSession();
 
 // Helper: assign a consistent color to each time group
-const groupColors = {};
-const colorPalette = [
-  "#e3f2fd",
-  "#ffe0b2",
-  "#e1bee7",
-  "#c8e6c9",
-  "#fff9c4",
-  "#f8bbd0",
-  "#d7ccc8",
-  "#b2dfdb",
-  "#f0f4c3",
-  "#f5e1a4",
-];
 function getGroupColor(group) {
   return window.nahalalUtils.getGroupColor(group);
 }
