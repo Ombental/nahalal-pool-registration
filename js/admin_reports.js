@@ -15,23 +15,76 @@ if (!window.nahalalSession.isLoggedIn()) {
   // Report logic can use user info here
 }
 
+let lastRegistrations = [];
+let lastDuplicates = [];
+
+function arrayToCSV(arr, columns) {
+  const escape = (str) => '"' + String(str).replace(/"/g, '""') + '"';
+  const header = columns.map(escape).join(",");
+  const rows = arr.map((row) =>
+    columns
+      .map((col) =>
+        escape(Array.isArray(row[col]) ? row[col].join("; ") : row[col] ?? "")
+      )
+      .join(",")
+  );
+  return [header, ...rows].join("\r\n");
+}
+
+function downloadCSV(filename, csv) {
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 0);
+}
+
 document
   .getElementById("export-registrations-btn")
   .addEventListener("click", () => {
-    feedback.textContent = "Exported registrations as CSV (placeholder).";
+    if (!lastRegistrations.length) {
+      feedback.textContent = "No registrations to export.";
+      feedback.className = "feedback error";
+      return;
+    }
+    const columns = [
+      "name",
+      "email",
+      "date",
+      "start_time",
+      "end_time",
+      "time_group",
+      "names",
+    ];
+    const csv = arrayToCSV(lastRegistrations, columns);
+    downloadCSV("registrations.csv", csv);
+    feedback.textContent = "Exported registrations as CSV.";
     feedback.className = "feedback success";
-    // TODO: Generate and download CSV
   });
 
 document
   .getElementById("export-duplicates-btn")
   .addEventListener("click", () => {
-    feedback.textContent = "Exported duplicates as CSV (placeholder).";
+    if (!lastDuplicates.length) {
+      feedback.textContent = "No duplicates to export.";
+      feedback.className = "feedback error";
+      return;
+    }
+    const columns = ["name", "email", "time_group", "count"];
+    const csv = arrayToCSV(lastDuplicates, columns);
+    downloadCSV("duplicates.csv", csv);
+    feedback.textContent = "Exported duplicates as CSV.";
     feedback.className = "feedback success";
-    // TODO: Generate and download CSV
   });
 
 function renderRegistrationsTable(registrations) {
+  lastRegistrations = registrations;
   if (!registrations.length) {
     registrationsTable.innerHTML = "<p>No registrations found.</p>";
     return;
@@ -53,6 +106,7 @@ function renderRegistrationsTable(registrations) {
 }
 
 function renderDuplicatesTable(duplicates) {
+  lastDuplicates = duplicates;
   if (!duplicates.length) {
     duplicatesTable.innerHTML = "<p>No duplicate registrations found.</p>";
     return;
@@ -71,36 +125,55 @@ function renderDuplicatesTable(duplicates) {
   duplicatesTable.innerHTML = html;
 }
 
-// Placeholder data
-const registrations = [
-  {
-    name: "Alice",
-    email: "alice@example.com",
-    date: "2024-07-01",
-    start_time: "10:00",
-    end_time: "11:00",
-    time_group: "Group 1",
-    names: ["Alice", "Bob"],
-  },
-  {
-    name: "Bob",
-    email: "bob@example.com",
-    date: "2024-07-02",
-    start_time: "09:00",
-    end_time: "10:00",
-    time_group: "Group 2",
-    names: ["Bob"],
-  },
-];
+async function fetchAndRenderReports() {
+  // Fetch all registrations with user and slot info
+  const { data: regs, error: regsError } = await supabase
+    .from("registrations")
+    .select(
+      `id, names, user_id, time_slot_id, users:user_id(name, email), time_slots:time_slot_id(date, start_time, end_time, time_group)`
+    );
+  if (regsError) {
+    feedback.textContent = `Error loading registrations: ${regsError.message}`;
+    feedback.className = "feedback error";
+    registrationsTable.innerHTML = "";
+    duplicatesTable.innerHTML = "";
+    return;
+  }
+  // Format for main table
+  const registrations = (regs || []).map((reg) => {
+    const user = reg.users || {};
+    const slot = reg.time_slots || {};
+    return {
+      name: user.name || "-",
+      email: user.email || "-",
+      date: slot.date || "-",
+      start_time: slot.start_time || "-",
+      end_time: slot.end_time || "-",
+      time_group: slot.time_group || "-",
+      names: reg.names || [],
+    };
+  });
+  renderRegistrationsTable(registrations);
 
-const duplicates = [
-  {
-    name: "Alice",
-    email: "alice@example.com",
-    time_group: "Group 1",
-    count: 2,
-  },
-];
+  // Find duplicates: users registered more than once in the same time group
+  const dupMap = {};
+  (regs || []).forEach((reg) => {
+    const user = reg.users || {};
+    const slot = reg.time_slots || {};
+    if (!user.email || !slot.time_group) return;
+    const key = user.email + "|" + slot.time_group;
+    if (!dupMap[key])
+      dupMap[key] = {
+        name: user.name,
+        email: user.email,
+        time_group: slot.time_group,
+        count: 0,
+      };
+    dupMap[key].count += 1;
+  });
+  const duplicates = Object.values(dupMap).filter((dup) => dup.count > 1);
+  renderDuplicatesTable(duplicates);
+}
 
-renderRegistrationsTable(registrations);
-renderDuplicatesTable(duplicates);
+// On page load, fetch and render
+fetchAndRenderReports();

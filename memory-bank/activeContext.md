@@ -1,23 +1,31 @@
-# Active Context: Nahalal Pool Registration
+# Active Context (Updated)
 
-## Current Focus
+## Current Work Focus
 
-- Requirements gathering and system design
-- Documenting Memory Bank files
-- Planning database schema and app flow
+- User-facing shared table view for upcoming time slots.
+- Ensuring table is visually clear, scrollable, and accessible for all slot configurations.
 
 ## Recent Changes
 
-- Project brief, product context, tech context, and system patterns documented
+- Table navigation arrows now move by 1 slot at a time.
+- Table always displays rows equal to the highest max participants among visible slots.
+- For slots with fewer max participants, extra cells are blacked out.
+- Table container now scrolls vertically (max-height: 60vh, overflow-y: auto).
+- Table headers are sticky for better usability.
+- All changes tested and confirmed working in browser.
 
 ## Next Steps
 
-- Define detailed schema (tables/models) for Supabase
-- Create Mermaid diagram for app flow and data model
-- Plan initial static frontend structure
+- Awaiting further feedback or new feature requests.
+- No known issues with the table view.
 
-## Important Decisions
+## Active Decisions & Considerations
 
-- No backend server; all logic via frontend and Supabase
-- Admin/regular user roles managed via Supabase
-- All code must be static and deployable to GitHub Pages
+- Table is rectangular and visually consistent regardless of slot configuration.
+- All scroll and sticky header logic is handled via CSS for reliability.
+- No pending refactors or technical debt in this area.
+
+## Insights
+
+- User experience for viewing large numbers of slots is now much improved.
+- The table is now robust for both admins and regular users.

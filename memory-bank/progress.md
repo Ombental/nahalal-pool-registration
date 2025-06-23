@@ -1,23 +1,23 @@
-# Progress: Nahalal Pool Registration
+# Progress (Updated)
 
 ## What Works
 
-- Project requirements and context documented
-- Tech stack and system patterns defined
+- Shared table view: scrollable, sticky headers, correct row counts, navigation by 1 slot, blacked out cells for slots with fewer max participants.
+- All recent UI/UX improvements are live and tested.
 
 ## What's Left to Build
 
-- Database schema and Supabase setup
-- Static frontend (HTML, JS, CSS)
-- Authentication and authorization flows
-- Admin and regular user UI
-- Registration, cancellation, and reporting features
+- Awaiting new features or feedback.
 
 ## Current Status
 
-- Planning and documentation phase
+- Table view is robust and user-friendly.
+- No known issues.
 
 ## Known Issues
 
-- No backend server may limit some advanced logic/reporting
-- Supabase RLS and triggers must be carefully designed for security
+- None for the table view as of last update.
+
+## Evolution of Project Decisions
+
+- Table view has evolved to maximize clarity and usability for all users.

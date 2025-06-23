@@ -69,6 +69,30 @@ async function addSlotHandler(e) {
     feedback.className = "feedback error";
     return;
   }
+  // Overlap validation
+  const { data: slotsOnDate, error: slotsError } = await supabase
+    .from("time_slots")
+    .select("id, start_time, end_time")
+    .eq("date", date);
+  if (slotsError) {
+    feedback.textContent = `Error checking overlaps: ${slotsError.message}`;
+    feedback.className = "feedback error";
+    return;
+  }
+  // Check for overlap (ignore self if editing)
+  const newStart = start_time;
+  const newEnd = end_time;
+  const overlap = (slotsOnDate || []).some((slot) => {
+    if (editingSlotId && slot.id === editingSlotId) return false;
+    // Overlap if: newStart < slot.end_time && newEnd > slot.start_time
+    return newStart < slot.end_time && newEnd > slot.start_time;
+  });
+  if (overlap) {
+    feedback.textContent =
+      "Time slot overlaps with an existing slot on this date.";
+    feedback.className = "feedback error";
+    return;
+  }
   if (editingSlotId) {
     // Update existing slot
     const { error } = await supabase
