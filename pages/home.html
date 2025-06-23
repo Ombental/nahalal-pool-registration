@@ -4,65 +4,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home | Nahalal Pool Registration</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        color: #222;
-        margin: 0;
-        padding: 0;
-      }
-      .container {
-        max-width: 500px;
-        margin: 60px auto;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 40px 30px;
-        text-align: center;
-      }
-      h2 {
-        color: #2a7ae2;
-      }
-      .user-info {
-        margin-bottom: 24px;
-      }
-      .nav-btn {
-        display: block;
-        width: 100%;
-        margin: 12px 0;
-        padding: 12px;
-        background: #2a7ae2;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        font-size: 1.1em;
-        cursor: pointer;
-        text-decoration: none;
-      }
-      .admin-link {
-        background: #e67e22;
-      }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
-  <body>
-    <div class="container">
-      <h2>Welcome to Nahalal Pool Registration</h2>
-      <div class="user-info" id="user-info">
-        <!-- User info will be populated by JS -->
-      </div>
-      <a href="registration.html" class="nav-btn">Register for a Time Slot</a>
-      <a href="registrations.html" class="nav-btn">My Registrations</a>
-      <a href="table.html" class="nav-btn">View All Time Slots</a>
+  <body class="bg-gray-100 text-gray-900 min-h-screen">
+    <div
+      class="max-w-xl mx-auto my-16 bg-white rounded-lg shadow-md p-10 text-center"
+    >
+      <h2 class="text-2xl font-bold text-blue-600 mb-6">
+        Welcome to Nahalal Pool Registration
+      </h2>
+      <div class="user-info mb-6" id="user-info"></div>
+      <a
+        href="registration.html"
+        class="block w-full my-3 py-3 bg-blue-600 text-white rounded-md text-lg font-semibold hover:bg-blue-700 transition"
+        >Register for a Time Slot</a
+      >
+      <a
+        href="registrations.html"
+        class="block w-full my-3 py-3 bg-blue-600 text-white rounded-md text-lg font-semibold hover:bg-blue-700 transition"
+        >My Registrations</a
+      >
+      <a
+        href="table.html"
+        class="block w-full my-3 py-3 bg-blue-600 text-white rounded-md text-lg font-semibold hover:bg-blue-700 transition"
+        >View All Time Slots</a
+      >
       <a
         href="admin.html"
-        class="nav-btn admin-link"
+        class="block w-full my-3 py-3 bg-orange-600 text-white rounded-md text-lg font-semibold hover:bg-orange-700 transition"
         id="admin-link"
         style="display: none"
         >Go to Admin Area</a
       >
-      <div style="text-align: center; margin-top: 20px">
-        <a href="../index.html">Back to App Entry</a>
+      <div class="text-center mt-6">
+        <a href="../index.html" class="text-blue-600 hover:underline"
+          >Back to App Entry</a
+        >
       </div>
     </div>
     <script src="../vendor/supabase.js"></script>

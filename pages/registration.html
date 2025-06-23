@@ -4,110 +4,77 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register for a Time Slot | Nahalal Pool Registration</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        color: #222;
-        margin: 0;
-        padding: 0;
-      }
-      .container {
-        max-width: 450px;
-        margin: 60px auto;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 36px 28px;
-      }
-      h2 {
-        color: #2a7ae2;
-        text-align: center;
-      }
-      form {
-        margin-top: 24px;
-      }
-      label {
-        display: block;
-        margin-bottom: 6px;
-      }
-      select,
-      input[type="text"] {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 12px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-      .names-list {
-        margin-bottom: 12px;
-      }
-      .add-name-btn {
-        background: #2a7ae2;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        padding: 6px 12px;
-        cursor: pointer;
-        margin-bottom: 12px;
-      }
-      button[type="submit"] {
-        width: 100%;
-        padding: 10px;
-        background: #2a7ae2;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        font-size: 1em;
-        cursor: pointer;
-      }
-      .feedback {
-        text-align: center;
-        margin-top: 16px;
-        font-weight: bold;
-      }
-      .error {
-        color: #d32f2f;
-      }
-      .success {
-        color: #388e3c;
-      }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
-  <body>
-    <div class="container">
-      <h2>Register for a Time Slot</h2>
-      <form id="registration-form">
-        <label for="date-select">Select Date</label>
-        <select id="date-select" required>
-          <option value="">-- Loading dates... --</option>
-        </select>
+  <body class="bg-gray-100 text-gray-900 min-h-screen">
+    <div class="max-w-md mx-auto my-16 bg-white rounded-lg shadow-md p-9">
+      <h2 class="text-2xl font-bold text-blue-600 text-center mb-8">
+        Register for a Time Slot
+      </h2>
+      <form id="registration-form" class="space-y-4">
+        <div>
+          <label for="date-select" class="block mb-1 font-medium"
+            >Select Date</label
+          >
+          <select
+            id="date-select"
+            required
+            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="">-- Loading dates... --</option>
+          </select>
+        </div>
         <div id="time-range-section" style="display: none">
-          <label for="time-select">Select Time Range</label>
-          <select id="time-select" required>
+          <label for="time-select" class="block mb-1 font-medium"
+            >Select Time Range</label
+          >
+          <select
+            id="time-select"
+            required
+            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400"
+          >
             <option value="">-- Select a time range --</option>
           </select>
         </div>
-        <div class="names-list" id="names-list" style="display: none">
-          <label>Names of People Coming With You</label>
-          <input type="text" class="name-input" placeholder="Name" />
+        <div class="names-list mb-3" id="names-list" style="display: none">
+          <label class="block mb-1 font-medium"
+            >Names of People Coming With You</label
+          >
+          <input
+            type="text"
+            class="name-input w-full p-2 border border-gray-300 rounded-md mb-2"
+            placeholder="Name"
+          />
         </div>
         <button
           type="button"
-          class="add-name-btn"
+          class="add-name-btn bg-blue-600 text-white rounded-md px-3 py-2 mb-2 hover:bg-blue-700 transition"
           id="add-name-btn"
           style="display: none"
         >
           + Add Another Name
         </button>
-        <button type="submit" id="submit-btn" style="display: none">
+        <button
+          type="submit"
+          id="submit-btn"
+          style="display: none"
+          class="w-full py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition"
+        >
           Submit Registration
         </button>
-        <div class="feedback" id="form-feedback"></div>
+        <div
+          class="feedback text-center font-bold mt-4"
+          id="form-feedback"
+        ></div>
       </form>
-      <div style="text-align: center; margin-top: 20px">
-        <a href="home.html">Back to Home</a> |
-        <a href="../index.html">App Entry</a>
+      <div class="text-center mt-6">
+        <a href="home.html" class="text-blue-600 hover:underline"
+          >Back to Home</a
+        >
+        <span class="mx-2">|</span>
+        <a href="../index.html" class="text-blue-600 hover:underline"
+          >App Entry</a
+        >
       </div>
     </div>
     <script src="../vendor/supabase.js"></script>

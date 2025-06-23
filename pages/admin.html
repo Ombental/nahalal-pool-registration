@@ -4,66 +4,46 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard | Nahalal Pool Registration</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        color: #222;
-        margin: 0;
-        padding: 0;
-      }
-      .container {
-        max-width: 500px;
-        margin: 60px auto;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 40px 30px;
-        text-align: center;
-      }
-      h2 {
-        color: #e67e22;
-      }
-      .admin-btn {
-        display: block;
-        width: 100%;
-        margin: 14px 0;
-        padding: 14px;
-        background: #e67e22;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        font-size: 1.1em;
-        cursor: pointer;
-        text-decoration: none;
-      }
-      .summary {
-        margin: 24px 0;
-        background: #f4f4f4;
-        border-radius: 6px;
-        padding: 16px;
-        color: #444;
-      }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
-  <body>
-    <div class="container">
-      <h2>Admin Dashboard</h2>
-      <div class="summary" id="summary">
-        <!-- Placeholder for summary stats -->
+  <body class="bg-gray-100 text-gray-900 min-h-screen">
+    <div
+      class="max-w-xl mx-auto my-16 bg-white rounded-lg shadow-md p-10 text-center"
+    >
+      <h2 class="text-2xl font-bold text-orange-600 mb-6">Admin Dashboard</h2>
+      <div
+        class="summary bg-gray-100 rounded-md p-4 text-gray-700 mb-8"
+        id="summary"
+      >
         <strong>Summary:</strong> <br />
         <span>Total Users: --</span><br />
         <span>Total Time Slots: --</span><br />
         <span>Total Registrations: --</span>
       </div>
-      <a href="admin_slots.html" class="admin-btn">Manage Time Slots</a>
-      <a href="admin_users.html" class="admin-btn">Manage User List</a>
-      <a href="admin_reports.html" class="admin-btn">View Reports</a>
-      <a href="home.html" class="admin-btn" style="background: #2a7ae2"
+      <a
+        href="admin_slots.html"
+        class="block w-full my-3 py-3 bg-orange-600 text-white rounded-md text-lg font-semibold hover:bg-orange-700 transition"
+        >Manage Time Slots</a
+      >
+      <a
+        href="admin_users.html"
+        class="block w-full my-3 py-3 bg-orange-600 text-white rounded-md text-lg font-semibold hover:bg-orange-700 transition"
+        >Manage User List</a
+      >
+      <a
+        href="admin_reports.html"
+        class="block w-full my-3 py-3 bg-orange-600 text-white rounded-md text-lg font-semibold hover:bg-orange-700 transition"
+        >View Reports</a
+      >
+      <a
+        href="home.html"
+        class="block w-full my-3 py-3 bg-blue-600 text-white rounded-md text-lg font-semibold hover:bg-blue-700 transition"
         >Back to Home</a
       >
-      <div style="text-align: center; margin-top: 20px">
-        <a href="../index.html">App Entry</a>
+      <div class="text-center mt-6">
+        <a href="../index.html" class="text-orange-600 hover:underline"
+          >App Entry</a
+        >
       </div>
     </div>
     <script src="../vendor/supabase.js"></script>

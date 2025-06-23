@@ -24,27 +24,29 @@ switchToRegular.addEventListener("click", () => {
 // Placeholder: Supabase Auth integration for both forms
 regularForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  document.getElementById("regular-error").textContent = "";
+  setError("regular-error", "");
   const email = document.getElementById("regular-email").value;
   try {
     await window.nahalalAuth.login(email);
     window.location.href = "home.html";
   } catch (err) {
-    document.getElementById("regular-error").textContent =
-      err.message || "Login failed.";
+    setError("regular-error", err.message || "Login failed.");
   }
 });
 
 adminForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  document.getElementById("admin-error").textContent = "";
+  setError("admin-error", "");
   const username = document.getElementById("admin-username").value;
   const password = document.getElementById("admin-password").value;
   try {
     await window.nahalalAuth.login(username, password);
     window.location.href = "admin.html";
   } catch (err) {
-    document.getElementById("admin-error").textContent =
-      err.message || "Login failed.";
+    setError("admin-error", err.message || "Login failed.");
   }
 });
+
+function setError(id, msg) {
+  window.nahalalUtils.setFeedback(document.getElementById(id), msg, true);
+}

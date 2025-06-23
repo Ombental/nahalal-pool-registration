@@ -22,8 +22,11 @@ async function fetchAndRenderRegistrations() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
   if (error) {
-    feedback.textContent = `Error loading registrations: ${error.message}`;
-    feedback.className = "feedback error";
+    window.nahalalUtils.setFeedback(
+      feedback,
+      `Error loading registrations: ${error.message}`,
+      true
+    );
     tableContainer.innerHTML = "";
     return;
   }
@@ -89,8 +92,13 @@ function renderTable(registrations) {
   });
   html += "</tbody></table>";
   tableContainer.innerHTML = html;
+  addCancelListeners(registrations);
+  addEditListeners(registrations);
+}
+
+function addCancelListeners(registrations) {
   document.querySelectorAll(".cancel-btn").forEach((btn) => {
-    btn.addEventListener("click", async (e) => {
+    btn.addEventListener("click", async () => {
       const regId = btn.getAttribute("data-id");
       if (confirm("Are you sure you want to cancel this registration?")) {
         const { error } = await supabase
@@ -98,107 +106,125 @@ function renderTable(registrations) {
           .delete()
           .eq("id", regId);
         if (error) {
-          feedback.textContent = `Error cancelling registration: ${error.message}`;
-          feedback.className = "feedback error";
+          window.nahalalUtils.setFeedback(
+            feedback,
+            `Error cancelling registration: ${error.message}`,
+            true
+          );
         } else {
-          feedback.textContent = "Registration cancelled.";
-          feedback.className = "feedback success";
+          window.nahalalUtils.setFeedback(
+            feedback,
+            "Registration cancelled.",
+            false
+          );
           fetchAndRenderRegistrations();
         }
       }
     });
   });
+}
+
+function addEditListeners(registrations) {
   document.querySelectorAll(".edit-names-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
+    btn.addEventListener("click", () => {
       const regId = btn.getAttribute("data-id");
       const reg = registrations.find((r) => r.id === regId);
       const cell = document.getElementById(`names-cell-${regId}`);
       if (!cell) return;
-      // Render input fields for each name, plus add/remove buttons
-      let inputsHtml = "";
-      (reg.names || []).forEach((name, i) => {
-        inputsHtml += `<div style='display:flex;align-items:center;margin-bottom:2px;'><input type='text' class='edit-name-input' value="${name.replace(
-          /"/g,
-          "&quot;"
-        )}" style='margin-right:6px;'/>${
-          reg.names.length > 1
-            ? `<button type='button' class='remove-name-btn' data-idx='${i}' style='background:none;border:none;color:#d32f2f;font-size:1.1em;cursor:pointer;'>✕</button>`
-            : ""
-        }</div>`;
-      });
-      if (!reg.names.length) {
-        inputsHtml += `<div style='display:flex;align-items:center;margin-bottom:2px;'><input type='text' class='edit-name-input' value="" style='margin-right:6px;'/></div>`;
-      }
-      inputsHtml += `<button type='button' class='add-name-btn' style='background:none;border:none;color:#2a7ae2;font-size:1.1em;cursor:pointer;margin-top:2px;'>+ Add Name</button>`;
-      inputsHtml += `<div style='margin-top:6px;'><button type='button' class='save-names-btn' style='background:#2a7ae2;color:#fff;border:none;border-radius:4px;padding:4px 10px;margin-right:6px;'>Save</button><button type='button' class='cancel-edit-btn' style='background:#bbb;color:#222;border:none;border-radius:4px;padding:4px 10px;'>Cancel</button></div>`;
-      cell.innerHTML = inputsHtml;
-      // Add handlers
-      cell.querySelector(".add-name-btn").onclick = () => {
-        const div = document.createElement("div");
-        div.style.display = "flex";
-        div.style.alignItems = "center";
-        div.style.marginBottom = "2px";
-        const input = document.createElement("input");
-        input.type = "text";
-        input.className = "edit-name-input";
-        input.style.marginRight = "6px";
-        // Only add remove button if more than 1 input will exist
-        if (cell.querySelectorAll(".edit-name-input").length >= 1) {
-          const removeBtn = document.createElement("button");
-          removeBtn.type = "button";
-          removeBtn.className = "remove-name-btn";
-          removeBtn.innerHTML = "✕";
-          removeBtn.style.background = "none";
-          removeBtn.style.border = "none";
-          removeBtn.style.color = "#d32f2f";
-          removeBtn.style.fontSize = "1.1em";
-          removeBtn.style.cursor = "pointer";
-          removeBtn.onclick = () => {
-            if (cell.querySelectorAll(".edit-name-input").length > 1)
-              div.remove();
-          };
-          div.appendChild(input);
-          div.appendChild(removeBtn);
-        } else {
-          div.appendChild(input);
-        }
-        cell.insertBefore(div, cell.querySelector(".add-name-btn"));
-      };
-      cell.querySelectorAll(".remove-name-btn").forEach((btn) => {
-        btn.onclick = () => {
-          if (cell.querySelectorAll(".edit-name-input").length > 1)
-            btn.parentElement.remove();
-        };
-      });
-      cell.querySelector(".cancel-edit-btn").onclick = () => {
-        renderTable(registrations);
-      };
-      cell.querySelector(".save-names-btn").onclick = async () => {
-        const nameInputs = cell.querySelectorAll(".edit-name-input");
-        const names = Array.from(nameInputs)
-          .map((input) => input.value.trim())
-          .filter((n) => n);
-        if (!names.length) {
-          feedback.textContent = "Please enter at least one name.";
-          feedback.className = "feedback error";
-          return;
-        }
-        // Update registration
-        const { error } = await supabase
-          .from("registrations")
-          .update({ names })
-          .eq("id", reg.id);
-        if (error) {
-          feedback.textContent = `Error updating registration: ${error.message}`;
-          feedback.className = "feedback error";
-        } else {
-          feedback.textContent = "Registration updated!";
-          feedback.className = "feedback success";
-          fetchAndRenderRegistrations();
-        }
-      };
+      renderEditNamesCell(cell, reg, registrations);
     });
   });
+}
+
+function renderEditNamesCell(cell, reg, registrations) {
+  let inputsHtml = "";
+  (reg.names || []).forEach((name, i) => {
+    inputsHtml += `<div style='display:flex;align-items:center;margin-bottom:2px;'><input type='text' class='edit-name-input' value="${name.replace(
+      /"/g,
+      "&quot;"
+    )}" style='margin-right:6px;'/>${
+      reg.names.length > 1
+        ? `<button type='button' class='remove-name-btn' data-idx='${i}' style='background:none;border:none;color:#d32f2f;font-size:1.1em;cursor:pointer;'>✕</button>`
+        : ""
+    }</div>`;
+  });
+  if (!reg.names.length) {
+    inputsHtml += `<div style='display:flex;align-items:center;margin-bottom:2px;'><input type='text' class='edit-name-input' value="" style='margin-right:6px;'/></div>`;
+  }
+  inputsHtml += `<button type='button' class='add-name-btn' style='background:none;border:none;color:#2a7ae2;font-size:1.1em;cursor:pointer;margin-top:2px;'>+ Add Name</button>`;
+  inputsHtml += `<div style='margin-top:6px;'><button type='button' class='save-names-btn' style='background:#2a7ae2;color:#fff;border:none;border-radius:4px;padding:4px 10px;margin-right:6px;'>Save</button><button type='button' class='cancel-edit-btn' style='background:#bbb;color:#222;border:none;border-radius:4px;padding:4px 10px;'>Cancel</button></div>`;
+  cell.innerHTML = inputsHtml;
+  addEditNamesHandlers(cell, reg, registrations);
+}
+
+function addEditNamesHandlers(cell, reg, registrations) {
+  cell.querySelector(".add-name-btn").onclick = () => {
+    const div = document.createElement("div");
+    div.style.display = "flex";
+    div.style.alignItems = "center";
+    div.style.marginBottom = "2px";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "edit-name-input";
+    input.style.marginRight = "6px";
+    if (cell.querySelectorAll(".edit-name-input").length >= 1) {
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "remove-name-btn";
+      removeBtn.innerHTML = "✕";
+      removeBtn.style.background = "none";
+      removeBtn.style.border = "none";
+      removeBtn.style.color = "#d32f2f";
+      removeBtn.style.fontSize = "1.1em";
+      removeBtn.style.cursor = "pointer";
+      removeBtn.onclick = () => {
+        if (cell.querySelectorAll(".edit-name-input").length > 1) div.remove();
+      };
+      div.appendChild(input);
+      div.appendChild(removeBtn);
+    } else {
+      div.appendChild(input);
+    }
+    cell.insertBefore(div, cell.querySelector(".add-name-btn"));
+  };
+  cell.querySelectorAll(".remove-name-btn").forEach((btn) => {
+    btn.onclick = () => {
+      if (cell.querySelectorAll(".edit-name-input").length > 1)
+        btn.parentElement.remove();
+    };
+  });
+  cell.querySelector(".cancel-edit-btn").onclick = () => {
+    renderTable(registrations);
+  };
+  cell.querySelector(".save-names-btn").onclick = async () => {
+    const nameInputs = cell.querySelectorAll(".edit-name-input");
+    const names = Array.from(nameInputs)
+      .map((input) => input.value.trim())
+      .filter((n) => n);
+    if (!names.length) {
+      window.nahalalUtils.setFeedback(
+        feedback,
+        "Please enter at least one name.",
+        true
+      );
+      return;
+    }
+    // Update registration
+    const { error } = await supabase
+      .from("registrations")
+      .update({ names })
+      .eq("id", reg.id);
+    if (error) {
+      window.nahalalUtils.setFeedback(
+        feedback,
+        `Error updating registration: ${error.message}`,
+        true
+      );
+    } else {
+      window.nahalalUtils.setFeedback(feedback, "Registration updated!", false);
+      fetchAndRenderRegistrations();
+    }
+  };
 }
 
 // On page load, fetch and render

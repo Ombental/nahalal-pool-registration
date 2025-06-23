@@ -26,11 +26,7 @@ const colorPalette = [
   "#f5e1a4",
 ];
 function getGroupColor(group) {
-  if (!groupColors[group]) {
-    const idx = Object.keys(groupColors).length % colorPalette.length;
-    groupColors[group] = colorPalette[idx];
-  }
-  return groupColors[group];
+  return window.nahalalUtils.getGroupColor(group);
 }
 
 // Fetch and render all slots
@@ -65,8 +61,7 @@ async function addSlotHandler(e) {
   );
   const time_group = document.getElementById("slot-group").value;
   if (start_time >= end_time) {
-    feedback.textContent = "Start time must be before end time.";
-    feedback.className = "feedback error";
+    setFeedback("Start time must be before end time.", true);
     return;
   }
   // Overlap validation
@@ -75,8 +70,7 @@ async function addSlotHandler(e) {
     .select("id, start_time, end_time")
     .eq("date", date);
   if (slotsError) {
-    feedback.textContent = `Error checking overlaps: ${slotsError.message}`;
-    feedback.className = "feedback error";
+    setFeedback(`Error checking overlaps: ${slotsError.message}`, true);
     return;
   }
   // Check for overlap (ignore self if editing)
@@ -88,9 +82,7 @@ async function addSlotHandler(e) {
     return newStart < slot.end_time && newEnd > slot.start_time;
   });
   if (overlap) {
-    feedback.textContent =
-      "Time slot overlaps with an existing slot on this date.";
-    feedback.className = "feedback error";
+    setFeedback("Time slot overlaps with an existing slot on this date.", true);
     return;
   }
   if (editingSlotId) {
@@ -100,11 +92,9 @@ async function addSlotHandler(e) {
       .update({ date, start_time, end_time, max_participants, time_group })
       .eq("id", editingSlotId);
     if (error) {
-      feedback.textContent = `Error: ${error.message}`;
-      feedback.className = "feedback error";
+      setFeedback(`Error: ${error.message}`, true);
     } else {
-      feedback.textContent = "Slot updated!";
-      feedback.className = "feedback success";
+      setFeedback("Slot updated!", false);
       form.reset();
       form.querySelector("button[type='submit']").textContent = "Add Time Slot";
       editingSlotId = null;
@@ -123,15 +113,17 @@ async function addSlotHandler(e) {
     };
     const { error } = await supabase.from("time_slots").insert([slot]);
     if (error) {
-      feedback.textContent = `Error: ${error.message}`;
-      feedback.className = "feedback error";
+      setFeedback(`Error: ${error.message}`, true);
     } else {
-      feedback.textContent = "Slot added!";
-      feedback.className = "feedback success";
+      setFeedback("Slot added!", false);
       form.reset();
       fetchSlots();
     }
   }
+}
+
+function setFeedback(msg, isError) {
+  window.nahalalUtils.setFeedback(feedback, msg, isError);
 }
 
 function renderTables(published, unpublished) {
@@ -141,8 +133,10 @@ function renderTables(published, unpublished) {
   html += `<h3>Unpublished Time Slots</h3>`;
   html += renderTable(unpublished, false);
   tableContainer.innerHTML = html;
+  addTableActionListeners(published, unpublished);
+}
 
-  // Add event listeners for actions (for both tables)
+function addTableActionListeners(published, unpublished) {
   document.querySelectorAll(".delete").forEach((btn) => {
     const isPublished = btn.getAttribute("data-published") === "true";
     if (isPublished) {
@@ -158,11 +152,9 @@ function renderTables(published, unpublished) {
           .delete()
           .eq("id", id);
         if (error) {
-          feedback.textContent = `Error: ${error.message}`;
-          feedback.className = "feedback error";
+          setFeedback(`Error: ${error.message}`, true);
         } else {
-          feedback.textContent = "Slot deleted.";
-          feedback.className = "feedback success";
+          setFeedback("Slot deleted.", false);
           fetchSlots();
         }
       }
@@ -188,11 +180,9 @@ function renderTables(published, unpublished) {
           .update({ published: true })
           .eq("id", id);
         if (error) {
-          feedback.textContent = `Error: ${error.message}`;
-          feedback.className = "feedback error";
+          setFeedback(`Error: ${error.message}`, true);
         } else {
-          feedback.textContent = "Slot published.";
-          feedback.className = "feedback success";
+          setFeedback("Slot published.", false);
           fetchSlots();
         }
       }

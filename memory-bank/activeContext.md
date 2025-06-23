@@ -1,23 +1,26 @@
-# Active Context (Updated)
+# Active Context
 
-## Current Work Focus
+## Current Focus
 
-- User-facing shared table view for upcoming time slots.
-- Ensuring table is visually clear, scrollable, and accessible for all slot configurations.
+- Codebase refactor for maintainability and DRY principles.
+- Extraction of common JS utilities into a single module.
 
 ## Recent Changes
 
-- Table navigation arrows now move by 1 slot at a time.
-- Table always displays rows equal to the highest max participants among visible slots.
-- For slots with fewer max participants, extra cells are blacked out.
-- Table container now scrolls vertically (max-height: 60vh, overflow-y: auto).
-- Table headers are sticky for better usability.
-- All changes tested and confirmed working in browser.
+- Created `js/utils.js` with:
+  - `sha256` (async hash)
+  - `setFeedback` (unified feedback display)
+  - `arrayToCSV` and `downloadCSV` (CSV export)
+  - `isFutureSlot` (date/time logic)
+  - `getGroupColor` (color assignment for slot groups)
+- Refactored all JS files to use these utilities via `window.nahalalUtils`.
+- Removed duplicate code for hashing, feedback, CSV, and color logic.
+- Improved maintainability and consistency across the codebase.
 
 ## Next Steps
 
-- Awaiting further feedback or new feature requests.
-- No known issues with the table view.
+- Monitor for further utility extraction opportunities.
+- Continue modularizing and documenting as new features are added.
 
 ## Active Decisions & Considerations
 

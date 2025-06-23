@@ -15,17 +15,6 @@ if (!window.nahalalSession.isLoggedIn()) {
   // User management logic can use user info here
 }
 
-// Helper: SHA-256 hash (browser-native)
-async function sha256(str) {
-  const buf = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(str)
-  );
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
 // Fetch and render all users
 async function fetchUsers() {
   const { data, error } = await supabase
@@ -41,7 +30,7 @@ async function fetchUsers() {
 
 userForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  userFeedback.textContent = "";
+  window.nahalalUtils.setFeedback(userFeedback, "");
   const email = document.getElementById("user-email").value.trim();
   const name = document.getElementById("user-name").value.trim();
   const role = document.getElementById("user-role").value;
@@ -49,25 +38,34 @@ userForm.addEventListener("submit", async (e) => {
   if (role === "admin") {
     password = prompt("Set a password for this admin user:");
     if (!password) {
-      userFeedback.textContent = "Password required for admin user.";
-      userFeedback.className = "feedback error";
+      window.nahalalUtils.setFeedback(
+        userFeedback,
+        "Password required for admin user.",
+        true
+      );
       return;
     }
-    password = await sha256(password);
+    password = await window.nahalalUtils.sha256(password);
   }
   const { error } = await supabase
     .from("users")
     .insert([{ email, name, role, password }]);
   if (error) {
-    userFeedback.textContent = `Error: ${error.message}`;
-    userFeedback.className = "feedback error";
+    window.nahalalUtils.setFeedback(
+      userFeedback,
+      `Error: ${error.message}`,
+      true
+    );
   } else {
-    userFeedback.textContent = "User added!";
-    userFeedback.className = "feedback success";
+    window.nahalalUtils.setFeedback(userFeedback, "User added!", false);
     userForm.reset();
     fetchUsers();
   }
 });
+
+function setUserFeedback(msg, isError) {
+  window.nahalalUtils.setFeedback(userFeedback, msg, isError);
+}
 
 function renderTable(users) {
   if (!users.length) {
@@ -98,8 +96,10 @@ function renderTable(users) {
   });
   html += "</tbody></table>";
   tableContainer.innerHTML = html;
+  addUserTableListeners();
+}
 
-  // Save role changes
+function addUserTableListeners() {
   document.querySelectorAll(".save").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
@@ -110,27 +110,22 @@ function renderTable(users) {
         .update({ role })
         .eq("id", id);
       if (error) {
-        userFeedback.textContent = `Error: ${error.message}`;
-        userFeedback.className = "feedback error";
+        setUserFeedback(`Error: ${error.message}`, true);
       } else {
-        userFeedback.textContent = "Role updated!";
-        userFeedback.className = "feedback success";
+        setUserFeedback("Role updated!", false);
         fetchUsers();
       }
     });
   });
-  // Delete user
   document.querySelectorAll(".delete").forEach((btn) => {
     btn.addEventListener("click", async () => {
       if (confirm("Delete this user?")) {
         const id = btn.getAttribute("data-id");
         const { error } = await supabase.from("users").delete().eq("id", id);
         if (error) {
-          userFeedback.textContent = `Error: ${error.message}`;
-          userFeedback.className = "feedback error";
+          setUserFeedback(`Error: ${error.message}`, true);
         } else {
-          userFeedback.textContent = "User deleted.";
-          userFeedback.className = "feedback success";
+          setUserFeedback("User deleted.", false);
           fetchUsers();
         }
       }

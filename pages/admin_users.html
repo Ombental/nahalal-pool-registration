@@ -4,112 +4,77 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manage User List | Nahalal Pool Registration</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        color: #222;
-        margin: 0;
-        padding: 0;
-      }
-      .container {
-        max-width: 900px;
-        margin: 60px auto;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 36px 28px;
-      }
-      h2 {
-        color: #e67e22;
-        text-align: center;
-      }
-      form {
-        margin-bottom: 32px;
-      }
-      label {
-        display: block;
-        margin-bottom: 6px;
-      }
-      input,
-      select {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 12px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-      button,
-      .action-btn {
-        background: #e67e22;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        padding: 8px 14px;
-        cursor: pointer;
-        margin-right: 6px;
-      }
-      .action-btn.delete {
-        background: #d32f2f;
-      }
-      .action-btn.save {
-        background: #388e3c;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 24px;
-      }
-      th,
-      td {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-        text-align: left;
-      }
-      th {
-        background: #f4f4f4;
-      }
-      .feedback {
-        text-align: center;
-        margin-top: 16px;
-        font-weight: bold;
-      }
-      .error {
-        color: #d32f2f;
-      }
-      .success {
-        color: #388e3c;
-      }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
-  <body>
-    <div class="container">
-      <h2>Manage User List</h2>
-      <form id="csv-upload-form">
-        <label for="csv-upload">Upload Users (CSV)</label>
-        <input type="file" id="csv-upload" accept=".csv" />
-        <button type="submit">Upload CSV</button>
-        <div class="feedback" id="csv-feedback"></div>
+  <body class="bg-gray-100 text-gray-900 min-h-screen">
+    <div class="max-w-4xl mx-auto my-16 bg-white rounded-lg shadow-md p-9">
+      <h2 class="text-2xl font-bold text-orange-600 text-center mb-8">
+        Manage User List
+      </h2>
+      <form id="csv-upload-form" class="mb-8 space-y-2">
+        <label for="csv-upload" class="block font-medium"
+          >Upload Users (CSV)</label
+        >
+        <input
+          type="file"
+          id="csv-upload"
+          accept=".csv"
+          class="block w-full border border-gray-300 rounded-md p-2"
+        />
+        <button
+          type="submit"
+          class="bg-orange-600 text-white rounded-md px-4 py-2 hover:bg-orange-700 transition"
+        >
+          Upload CSV
+        </button>
+        <div
+          class="feedback text-center font-bold mt-2"
+          id="csv-feedback"
+        ></div>
       </form>
-      <form id="user-form">
-        <label for="user-email">Email</label>
-        <input type="email" id="user-email" required />
-        <label for="user-name">Name</label>
-        <input type="text" id="user-name" required />
-        <label for="user-role">Role</label>
-        <select id="user-role">
+      <form id="user-form" class="mb-8 space-y-2">
+        <label for="user-email" class="block font-medium">Email</label>
+        <input
+          type="email"
+          id="user-email"
+          required
+          class="w-full border border-gray-300 rounded-md p-2"
+        />
+        <label for="user-name" class="block font-medium">Name</label>
+        <input
+          type="text"
+          id="user-name"
+          required
+          class="w-full border border-gray-300 rounded-md p-2"
+        />
+        <label for="user-role" class="block font-medium">Role</label>
+        <select
+          id="user-role"
+          class="w-full border border-gray-300 rounded-md p-2"
+        >
           <option value="regular">Regular</option>
           <option value="admin">Admin</option>
         </select>
-        <button type="submit">Add User</button>
-        <div class="feedback" id="user-feedback"></div>
+        <button
+          type="submit"
+          class="bg-orange-600 text-white rounded-md px-4 py-2 hover:bg-orange-700 transition"
+        >
+          Add User
+        </button>
+        <div
+          class="feedback text-center font-bold mt-2"
+          id="user-feedback"
+        ></div>
       </form>
-      <div id="users-table-container">
-        <!-- Table will be populated by JS -->
-      </div>
-      <div style="text-align: center; margin-top: 20px">
-        <a href="admin.html">Back to Admin Home</a> |
-        <a href="../index.html">App Entry</a>
+      <div id="users-table-container"></div>
+      <div class="text-center mt-6">
+        <a href="admin.html" class="text-orange-600 hover:underline"
+          >Back to Admin Home</a
+        >
+        <span class="mx-2">|</span>
+        <a href="../index.html" class="text-orange-600 hover:underline"
+          >App Entry</a
+        >
       </div>
     </div>
     <script src="../vendor/supabase.js"></script>

@@ -7,13 +7,16 @@ const submitBtn = document.getElementById("submit-btn");
 const form = document.getElementById("registration-form");
 const feedback = document.getElementById("form-feedback");
 
-let slotsByDate = {}; // {date: [slot, ...]}
+let slotsByDate = {};
 let slots = [];
 let selectedSlot = null;
 let placesLeft = 0;
-let userRegistrationsByGroup = {}; // {time_group: registration}
+let userRegistrationsByGroup = {};
 
-// Load available published slots and registrations
+function isFutureSlot(slot, now = new Date()) {
+  return window.nahalalUtils.isFutureSlot(slot, now);
+}
+
 async function loadSlotsAndRegistrations() {
   const { data: slotsData, error: slotsError } = await supabase
     .from("time_slots")
@@ -25,24 +28,9 @@ async function loadSlotsAndRegistrations() {
     dateSelect.innerHTML = `<option value="">Error loading slots</option>`;
     return;
   }
-  // Only future slots
   const now = new Date();
-  slots = (slotsData || []).filter((slot) => {
-    const slotDate = new Date(slot.date);
-    if (slotDate > now) return true;
-    if (
-      slotDate.toISOString().slice(0, 10) === now.toISOString().slice(0, 10)
-    ) {
-      // Compare end_time to now
-      const [h, m, s] = slot.end_time.split(":");
-      const slotEnd = new Date(slot.date + "T" + slot.end_time);
-      return slotEnd > now;
-    }
-    return false;
-  });
-  // Get all slot ids
+  slots = (slotsData || []).filter((slot) => isFutureSlot(slot, now));
   const slotIds = slots.map((s) => s.id);
-  // Fetch all registrations for these slots
   const { data: regs, error: regsError } = await supabase
     .from("registrations")
     .select("id, time_slot_id, names, time_slots:time_slot_id(time_group)")
@@ -52,28 +40,27 @@ async function loadSlotsAndRegistrations() {
     dateSelect.innerHTML = `<option value="">Error loading registrations</option>`;
     return;
   }
-  // Map slot id to number of registered names
   const slotIdToCount = {};
   userRegistrationsByGroup = {};
   regs.forEach((r) => {
     slotIdToCount[r.time_slot_id] =
       (slotIdToCount[r.time_slot_id] || 0) + (r.names ? r.names.length : 0);
-    // Track user's registration by time group
     if (r.time_slots && r.time_slots.time_group) {
       userRegistrationsByGroup[r.time_slots.time_group] = r;
     }
   });
-  // Attach placesLeft to each slot
   slots.forEach((slot) => {
     slot.placesLeft = slot.max_participants - (slotIdToCount[slot.id] || 0);
   });
-  // Group slots by date
   slotsByDate = {};
   slots.forEach((slot) => {
     if (!slotsByDate[slot.date]) slotsByDate[slot.date] = [];
     slotsByDate[slot.date].push(slot);
   });
-  // Populate date dropdown
+  populateDateDropdown();
+}
+
+function populateDateDropdown() {
   const uniqueDates = Object.keys(slotsByDate);
   if (!uniqueDates.length) {
     dateSelect.innerHTML = `<option value="">No available dates</option>`;
@@ -91,7 +78,12 @@ async function loadSlotsAndRegistrations() {
   });
 }
 
-window.addEventListener("DOMContentLoaded", loadSlotsAndRegistrations);
+function clearNameInputs() {
+  Array.from(document.querySelectorAll(".name-input")).forEach((input, i) => {
+    if (i > 0) input.remove();
+    input.value = "";
+  });
+}
 
 dateSelect.addEventListener("change", () => {
   timeSelect.innerHTML = `<option value="">-- Select a time range --</option>`;
@@ -112,11 +104,7 @@ timeSelect.addEventListener("change", () => {
   namesList.style.display = "none";
   addNameBtn.style.display = "none";
   submitBtn.style.display = "none";
-  // Remove all but the first name input
-  Array.from(document.querySelectorAll(".name-input")).forEach((input, i) => {
-    if (i > 0) input.remove();
-    input.value = "";
-  });
+  clearNameInputs();
   if (!timeSelect.value) return;
   selectedSlot = slots.find((s) => s.id === timeSelect.value);
   placesLeft = selectedSlot ? selectedSlot.placesLeft : 0;
@@ -125,32 +113,17 @@ timeSelect.addEventListener("change", () => {
     feedback.className = "feedback error";
     return;
   }
-  // Check if user already registered for this time group
   const existingReg = userRegistrationsByGroup[selectedSlot.time_group];
   if (existingReg) {
     feedback.textContent =
       "You already have a registration for this time group. You can edit the names and update.";
     feedback.className = "feedback";
-    // Populate names
     const names = existingReg.names || [];
-    // Remove all but one input
-    Array.from(document.querySelectorAll(".name-input")).forEach((input, i) => {
-      if (i > 0) input.parentElement.remove();
-      input.value = names[i] || "";
-    });
-    // Add more inputs if needed
+    clearNameInputs();
+    const firstInput = document.querySelector(".name-input");
+    if (firstInput) firstInput.value = names[0] || "";
     for (let i = 1; i < names.length; i++) {
-      const wrapper = document.createElement("div");
-      wrapper.style.display = "flex";
-      wrapper.style.alignItems = "center";
-      const input = document.createElement("input");
-      input.type = "text";
-      input.className = "name-input";
-      input.placeholder = "Name";
-      input.value = names[i];
-      wrapper.appendChild(input);
-      namesList.appendChild(wrapper);
-      input.addEventListener("input", updateNameInputs);
+      addNameInput(names[i]);
     }
     namesList.style.display = "block";
     addNameBtn.style.display = "block";
@@ -169,15 +142,27 @@ timeSelect.addEventListener("change", () => {
   }
 });
 
+function addNameInput(value = "") {
+  const wrapper = document.createElement("div");
+  wrapper.style.display = "flex";
+  wrapper.style.alignItems = "center";
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "name-input";
+  input.placeholder = "Name";
+  input.value = value;
+  wrapper.appendChild(input);
+  namesList.appendChild(wrapper);
+  input.addEventListener("input", updateNameInputs);
+}
+
 function updateNameInputs() {
   const nameInputs = document.querySelectorAll(".name-input");
-  // Limit number of name inputs to placesLeft
   if (nameInputs.length > placesLeft) {
     for (let i = nameInputs.length - 1; i >= placesLeft; i--) {
       nameInputs[i].parentElement.remove();
     }
   }
-  // Add remove buttons to all but the first input
   document.querySelectorAll(".remove-name-btn").forEach((btn) => btn.remove());
   nameInputs.forEach((input, i) => {
     if (i > 0) {
@@ -199,9 +184,7 @@ function updateNameInputs() {
       }
     }
   });
-  // Show/hide add button
   addNameBtn.style.display = nameInputs.length < placesLeft ? "block" : "none";
-  // Show submit if at least one name
   const atLeastOne = Array.from(nameInputs).some((input) => input.value.trim());
   submitBtn.style.display = atLeastOne ? "block" : "none";
 }
@@ -209,16 +192,7 @@ function updateNameInputs() {
 addNameBtn.addEventListener("click", () => {
   const nameInputs = document.querySelectorAll(".name-input");
   if (nameInputs.length < placesLeft) {
-    const wrapper = document.createElement("div");
-    wrapper.style.display = "flex";
-    wrapper.style.alignItems = "center";
-    const input = document.createElement("input");
-    input.type = "text";
-    input.className = "name-input";
-    input.placeholder = "Name";
-    wrapper.appendChild(input);
-    namesList.appendChild(wrapper);
-    input.addEventListener("input", updateNameInputs);
+    addNameInput();
     updateNameInputs();
   }
 });
@@ -235,7 +209,6 @@ form.addEventListener("submit", async (e) => {
     feedback.className = "feedback error";
     return;
   }
-  // Gather names (remove empty)
   const names = Array.from(document.querySelectorAll(".name-input"))
     .map((input) => input.value.trim())
     .filter((n) => n);
@@ -249,10 +222,8 @@ form.addEventListener("submit", async (e) => {
     feedback.className = "feedback error";
     return;
   }
-  // Check if editing
   const editId = submitBtn.getAttribute("data-edit-id");
   if (editId) {
-    // Update registration
     const { error } = await supabase
       .from("registrations")
       .update({ names, time_slot_id: selectedSlot.id })
@@ -267,7 +238,6 @@ form.addEventListener("submit", async (e) => {
       window.location.href = "registrations.html";
     }
   } else {
-    // Check again for existing registration for this group (race condition)
     const existingReg = userRegistrationsByGroup[selectedSlot.time_group];
     if (existingReg) {
       feedback.textContent =
@@ -275,7 +245,6 @@ form.addEventListener("submit", async (e) => {
       feedback.className = "feedback error";
       return;
     }
-    // Create registration
     const { error } = await supabase.from("registrations").insert([
       {
         user_id: user.id,

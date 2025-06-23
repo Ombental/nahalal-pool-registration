@@ -1,5 +1,5 @@
 const SESSION_KEY = "nahalal_user";
-const SESSION_TIMEOUT_MS = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
+const SESSION_TIMEOUT_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 function setSession(user) {
   const session = {
@@ -22,6 +22,7 @@ function getSession() {
       clearSession();
       return null;
     }
+    // Sliding window: update timestamp on access
     session.createdAt = Date.now();
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     return session.user;

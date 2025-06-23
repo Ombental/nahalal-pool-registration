@@ -19,38 +19,22 @@ let lastRegistrations = [];
 let lastDuplicates = [];
 
 function arrayToCSV(arr, columns) {
-  const escape = (str) => '"' + String(str).replace(/"/g, '""') + '"';
-  const header = columns.map(escape).join(",");
-  const rows = arr.map((row) =>
-    columns
-      .map((col) =>
-        escape(Array.isArray(row[col]) ? row[col].join("; ") : row[col] ?? "")
-      )
-      .join(",")
-  );
-  return [header, ...rows].join("\r\n");
+  return window.nahalalUtils.arrayToCSV(arr, columns);
 }
 
 function downloadCSV(filename, csv) {
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => {
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, 0);
+  window.nahalalUtils.downloadCSV(filename, csv);
+}
+
+function setFeedback(msg, isError) {
+  window.nahalalUtils.setFeedback(feedback, msg, isError);
 }
 
 document
   .getElementById("export-registrations-btn")
   .addEventListener("click", () => {
     if (!lastRegistrations.length) {
-      feedback.textContent = "No registrations to export.";
-      feedback.className = "feedback error";
+      setFeedback("No registrations to export.", true);
       return;
     }
     const columns = [
@@ -64,23 +48,20 @@ document
     ];
     const csv = arrayToCSV(lastRegistrations, columns);
     downloadCSV("registrations.csv", csv);
-    feedback.textContent = "Exported registrations as CSV.";
-    feedback.className = "feedback success";
+    setFeedback("Exported registrations as CSV.", false);
   });
 
 document
   .getElementById("export-duplicates-btn")
   .addEventListener("click", () => {
     if (!lastDuplicates.length) {
-      feedback.textContent = "No duplicates to export.";
-      feedback.className = "feedback error";
+      setFeedback("No duplicates to export.", true);
       return;
     }
     const columns = ["name", "email", "time_group", "count"];
     const csv = arrayToCSV(lastDuplicates, columns);
     downloadCSV("duplicates.csv", csv);
-    feedback.textContent = "Exported duplicates as CSV.";
-    feedback.className = "feedback success";
+    setFeedback("Exported duplicates as CSV.", false);
   });
 
 function renderRegistrationsTable(registrations) {
@@ -133,8 +114,7 @@ async function fetchAndRenderReports() {
       `id, names, user_id, time_slot_id, users:user_id(name, email), time_slots:time_slot_id(date, start_time, end_time, time_group)`
     );
   if (regsError) {
-    feedback.textContent = `Error loading registrations: ${regsError.message}`;
-    feedback.className = "feedback error";
+    setFeedback(`Error loading registrations: ${regsError.message}`, true);
     registrationsTable.innerHTML = "";
     duplicatesTable.innerHTML = "";
     return;
