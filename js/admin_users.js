@@ -143,7 +143,9 @@ csvForm.addEventListener("submit", async (e) => {
       setUserFeedback("לא נמצאו משתמשים תקינים בקובץ.", true);
       return;
     }
-    const { error } = await supabase.from("users").insert(users);
+    const { error } = await supabase
+      .from("users")
+      .upsert(users, { onConflict: ["email"] });
     if (error) {
       setUserFeedback(i18n.error(error.message), true);
     } else {
