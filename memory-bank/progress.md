@@ -1,23 +1,28 @@
-# Progress
+# Progress (as of reset)
 
 ## What Works
 
-- All major user/admin flows functional (registration, slot management, user management, reports, shared table, etc.)
-- Supabase CRUD fully integrated for all data operations
-- Session/auth, validation, and feedback flows are robust
-- Table and registration UX is modern and accessible
-- **Common utilities (feedback, hashing, CSV, color, date logic) are now centralized in js/utils.js and used throughout the codebase**
+- User CSV upload (with correct parsing and field mapping)
+- User table display (with names array)
+- Admin can remove individual names from registrations in the table view
+- Published/unpublished slot management (edit, actions, readable tables)
+- Registration table (user view) is responsive and clean
+- All table UIs are modern and mobile-friendly
+- Registration form uses dropdowns for names, each name can only be selected once, and users can add/remove name dropdowns dynamically
 
 ## What's Left
 
-- Ongoing: monitor for further refactor/utility opportunities
-- Ongoing: feature requests, bugfixes, and documentation
+- (Optional) Confirmation dialogs for destructive admin actions
+- (Optional) More granular admin reporting or analytics
+- (Optional) User feedback for CSV upload errors (per-row)
+- (Optional) Editing names for existing users
 
 ## Current Status
 
-- Codebase is DRY, modular, and easy to maintain
-- All known duplicate logic for feedback, hashing, CSV, and color is removed
-- Memory bank and documentation are up to date
+- All core admin and user flows are robust and visually polished
+- Database and frontend are in sync
+- Registration form is user-friendly and prevents duplicate name selection
+- Ready for further feature requests or deployment
 
 ## Known Issues
 

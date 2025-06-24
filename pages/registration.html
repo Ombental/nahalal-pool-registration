@@ -1,50 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register for a Time Slot | Nahalal Pool Registration</title>
+    <title>הרשמה למשבצת זמן | רישום לבריכת נהלל</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body class="bg-gray-100 text-gray-900 min-h-screen">
     <div class="max-w-md mx-auto my-16 bg-white rounded-lg shadow-md p-9">
       <h2 class="text-2xl font-bold text-blue-600 text-center mb-8">
-        Register for a Time Slot
+        הרשמה למשבצת זמן
       </h2>
       <form id="registration-form" class="space-y-4">
         <div>
           <label for="date-select" class="block mb-1 font-medium"
-            >Select Date</label
+            >בחר תאריך</label
           >
           <select
             id="date-select"
             required
             class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400"
           >
-            <option value="">-- Loading dates... --</option>
+            <option value="">-- טוען תאריכים... --</option>
           </select>
         </div>
         <div id="time-range-section" style="display: none">
           <label for="time-select" class="block mb-1 font-medium"
-            >Select Time Range</label
+            >בחר טווח זמן</label
           >
           <select
             id="time-select"
             required
             class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400"
           >
-            <option value="">-- Select a time range --</option>
+            <option value="">-- בחר טווח זמן --</option>
           </select>
         </div>
         <div class="names-list mb-3" id="names-list" style="display: none">
-          <label class="block mb-1 font-medium"
-            >Names of People Coming With You</label
-          >
-          <input
-            type="text"
-            class="name-input w-full p-2 border border-gray-300 rounded-md mb-2"
-            placeholder="Name"
-          />
+          <label class="block mb-1 font-medium">שמות רשומים</label>
+          <!-- Name dropdowns will be dynamically inserted here by JS -->
         </div>
         <button
           type="button"
@@ -52,7 +46,7 @@
           id="add-name-btn"
           style="display: none"
         >
-          + Add Another Name
+          + הוסף שם נוסף
         </button>
         <button
           type="submit"
@@ -60,7 +54,7 @@
           style="display: none"
           class="w-full py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition"
         >
-          Submit Registration
+          שלח הרשמה
         </button>
         <div
           class="feedback text-center font-bold mt-4"
@@ -69,11 +63,11 @@
       </form>
       <div class="text-center mt-6">
         <a href="home.html" class="text-blue-600 hover:underline"
-          >Back to Home</a
+          >חזרה לדף הבית</a
         >
         <span class="mx-2">|</span>
         <a href="../index.html" class="text-blue-600 hover:underline"
-          >App Entry</a
+          >התנתקות</a
         >
       </div>
     </div>

@@ -12,6 +12,36 @@ let slots = [];
 let selectedSlot = null;
 let placesLeft = 0;
 let userRegistrationsByGroup = {};
+let userNamesOptions = [];
+let userNamesUsedByGroup = {};
+
+// i18n: Hebrew translations
+const i18n = {
+  selectDate: "בחר תאריך",
+  selectTimeRange: "בחר טווח זמן",
+  namesOfPeople: "שמות רשומים",
+  addAnotherName: "הוסף שם נוסף",
+  submitRegistration: "שלח הרשמה",
+  updateRegistration: "עדכן הרשמה",
+  pleaseSelectAtLeastOneName: "יש לבחור לפחות שם אחד",
+  pleaseSelectTimeSlot: "יש לבחור משבצת זמן",
+  noPlacesLeft: "אין מקומות פנויים למשבצת זו",
+  registrationSuccess: "ההרשמה בוצעה בהצלחה",
+  registrationUpdated: "ההרשמה עודכנה בהצלחה",
+  maxPeople: (x) => `ניתן להירשם עד ${x} אנשים`,
+  nameAlreadyUsed: (n) => `השם '${n}' כבר נרשם לקבוצה זו`,
+  pleaseEnterAtLeastOneName: "יש להזין לפחות שם אחד",
+  pleaseEnterTimeSlot: "יש לבחור משבצת זמן",
+  noAvailableDates: "אין תאריכים זמינים",
+  selectDateOption: "-- בחר תאריך --",
+  selectTimeRangeOption: "-- בחר טווח זמן --",
+  placesLeft: (x) => `| ${x} מקומות פנויים`,
+  remove: "הסר",
+  errorLoadingSlots: "שגיאה בטעינת משבצות זמן",
+  errorLoadingRegistrations: "שגיאה בטעינת הרשמות",
+  error: (msg) => `שגיאה: ${msg}`,
+  allRegistered: "נרשמת לכל המשבצות זמן האפשריות!",
+};
 
 function isFutureSlot(slot, now = new Date()) {
   return window.nahalalUtils.isFutureSlot(slot, now);
@@ -25,7 +55,7 @@ async function loadSlotsAndRegistrations() {
     .order("date", { ascending: true })
     .order("start_time", { ascending: true });
   if (slotsError) {
-    dateSelect.innerHTML = `<option value="">Error loading slots</option>`;
+    dateSelect.innerHTML = `<option value="">${i18n.errorLoadingSlots}</option>`;
     return;
   }
   const now = new Date();
@@ -37,7 +67,7 @@ async function loadSlotsAndRegistrations() {
     .in("time_slot_id", slotIds)
     .eq("user_id", window.nahalalSession.getSession().id);
   if (regsError) {
-    dateSelect.innerHTML = `<option value="">Error loading registrations</option>`;
+    dateSelect.innerHTML = `<option value="">${i18n.errorLoadingRegistrations}</option>`;
     return;
   }
   const slotIdToCount = {};
@@ -46,7 +76,12 @@ async function loadSlotsAndRegistrations() {
     slotIdToCount[r.time_slot_id] =
       (slotIdToCount[r.time_slot_id] || 0) + (r.names ? r.names.length : 0);
     if (r.time_slots && r.time_slots.time_group) {
-      userRegistrationsByGroup[r.time_slots.time_group] = r;
+      // Track all names used in this group
+      const group = r.time_slots.time_group;
+      if (!userNamesUsedByGroup[group]) userNamesUsedByGroup[group] = new Set();
+      (r.names || []).forEach((n) => userNamesUsedByGroup[group].add(n));
+      // Track the registration object for this group (for legacy logic)
+      userRegistrationsByGroup[group] = r;
     }
   });
   slots.forEach((slot) => {
@@ -62,19 +97,33 @@ async function loadSlotsAndRegistrations() {
 
 function populateDateDropdown() {
   const uniqueDates = Object.keys(slotsByDate);
-  if (!uniqueDates.length) {
-    dateSelect.innerHTML = `<option value="">No available dates</option>`;
-    return;
-  }
-  dateSelect.innerHTML = `<option value="">-- Select a date --</option>`;
+  dateSelect.innerHTML = `<option value="">${i18n.selectDateOption}</option>`;
+  feedback.textContent = "";
+  form.style.display = "block";
   uniqueDates.forEach((date) => {
-    const day = new Date(date);
-    const dayName = day.toLocaleDateString(undefined, { weekday: "long" });
-    const dayMonth = day.toLocaleDateString(undefined, {
-      day: "2-digit",
-      month: "2-digit",
+    // Only include dates with at least one slot that is not in a full group
+    const slotsForDate = slotsByDate[date].filter((slot) => {
+      const group = slot.time_group;
+      const used = userNamesUsedByGroup[group]
+        ? userNamesUsedByGroup[group].size
+        : 0;
+      return used < userNamesOptions.length;
     });
-    dateSelect.innerHTML += `<option value="${date}">${dayName} ${dayMonth}</option>`;
+    if (slotsForDate.length > 0) {
+      const day = new Date(date);
+      const dayName = day.toLocaleDateString("he-IL", { weekday: "long" });
+      const dayMonth = day.toLocaleDateString("he-IL", {
+        day: "2-digit",
+        month: "2-digit",
+      });
+      dateSelect.innerHTML += `<option value="${date}">${dayName} ${dayMonth}</option>`;
+    } else {
+      dateSelect.innerHTML = `<option value="">${i18n.noAvailableDates}</option>`;
+      // Show message if user has registered to everything possible
+      feedback.textContent = i18n.allRegistered;
+      feedback.className = "feedback success";
+      return;
+    }
   });
 }
 
@@ -86,7 +135,7 @@ function clearNameInputs() {
 }
 
 dateSelect.addEventListener("change", () => {
-  timeSelect.innerHTML = `<option value="">-- Select a time range --</option>`;
+  timeSelect.innerHTML = `<option value="">${i18n.selectTimeRangeOption}</option>`;
   timeRangeSection.style.display = "none";
   namesList.style.display = "none";
   addNameBtn.style.display = "none";
@@ -95,7 +144,9 @@ dateSelect.addEventListener("change", () => {
   if (!dateSelect.value) return;
   const slotsForDate = slotsByDate[dateSelect.value] || [];
   slotsForDate.forEach((slot) => {
-    timeSelect.innerHTML += `<option value="${slot.id}">${slot.start_time} - ${slot.end_time} | ${slot.placesLeft} places left</option>`;
+    timeSelect.innerHTML += `<option value="${slot.id}">${slot.start_time} - ${
+      slot.end_time
+    } | ${slot.placesLeft} ${i18n.placesLeft(slot.placesLeft)}</option>`;
   });
   timeRangeSection.style.display = "block";
 });
@@ -108,84 +159,132 @@ timeSelect.addEventListener("change", () => {
   if (!timeSelect.value) return;
   selectedSlot = slots.find((s) => s.id === timeSelect.value);
   placesLeft = selectedSlot ? selectedSlot.placesLeft : 0;
-  if (placesLeft <= 0) {
-    feedback.textContent = "No places left for this slot.";
+  // Check if the selected slot's group is full (shouldn't happen, but guard)
+  const group = selectedSlot ? selectedSlot.time_group : null;
+  const used =
+    group && userNamesUsedByGroup[group] ? userNamesUsedByGroup[group].size : 0;
+  if (placesLeft <= 0 || (group && used >= userNamesOptions.length)) {
+    feedback.textContent = i18n.noPlacesLeft;
     feedback.className = "feedback error";
     return;
   }
-  const existingReg = userRegistrationsByGroup[selectedSlot.time_group];
-  if (existingReg) {
-    feedback.textContent =
-      "You already have a registration for this time group. You can edit the names and update.";
-    feedback.className = "feedback";
-    const names = existingReg.names || [];
-    clearNameInputs();
-    const firstInput = document.querySelector(".name-input");
-    if (firstInput) firstInput.value = names[0] || "";
-    for (let i = 1; i < names.length; i++) {
-      addNameInput(names[i]);
-    }
-    namesList.style.display = "block";
-    addNameBtn.style.display = "block";
-    updateNameInputs();
-    submitBtn.textContent = "Update Registration";
-    submitBtn.style.display = "block";
-    submitBtn.setAttribute("data-edit-id", existingReg.id);
-  } else {
-    feedback.textContent = "";
-    namesList.style.display = "block";
-    addNameBtn.style.display = "block";
-    updateNameInputs();
-    submitBtn.textContent = "Submit Registration";
-    submitBtn.style.display = "block";
-    submitBtn.removeAttribute("data-edit-id");
-  }
+  // Always show a blank form for new registrations (do not block by group)
+  feedback.textContent = "";
+  namesList.style.display = "block";
+  addNameBtn.style.display = "block";
+  updateNameInputs();
+  submitBtn.textContent = i18n.submitRegistration;
+  submitBtn.style.display = "block";
+  submitBtn.removeAttribute("data-edit-id");
 });
+
+// Fetch user names from session on load
+function getUserNames() {
+  const user = window.nahalalSession.getSession();
+  return user && user.names ? user.names : [];
+}
 
 function addNameInput(value = "") {
   const wrapper = document.createElement("div");
   wrapper.style.display = "flex";
   wrapper.style.alignItems = "center";
-  const input = document.createElement("input");
-  input.type = "text";
-  input.className = "name-input";
-  input.placeholder = "Name";
-  input.value = value;
-  wrapper.appendChild(input);
+  const select = document.createElement("select");
+  select.className =
+    "name-input w-full p-2 border border-gray-300 rounded-md mb-2";
+  select.placeholder = i18n.namesOfPeople;
+  // Determine available options (exclude already selected and already used in group)
+  const nameInputs = Array.from(document.querySelectorAll(".name-input"));
+  const selectedNames = nameInputs.map((input) => input.value).filter((n) => n);
+  const group = selectedSlot ? selectedSlot.time_group : null;
+  const usedInGroup =
+    group && userNamesUsedByGroup[group]
+      ? Array.from(userNamesUsedByGroup[group])
+      : [];
+  let available = userNamesOptions.filter(
+    (name) => !selectedNames.includes(name) && !usedInGroup.includes(name)
+  );
+  // If value is provided and available, use it; otherwise, select the first available
+  let selected =
+    value && available.includes(value) ? value : available[0] || "";
+  available.forEach((name) => {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    if (name === selected) option.selected = true;
+    select.appendChild(option);
+  });
+  wrapper.appendChild(select);
+  // Add remove (X) button if more than one name input
+  if (document.querySelectorAll(".name-input").length > 0) {
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.innerHTML = "";
+    removeBtn.title = i18n.remove;
+    removeBtn.className = "remove-name-btn text-red-500 ml-2";
+    removeBtn.style.background = "none";
+    removeBtn.style.border = "none";
+    removeBtn.style.fontSize = "1.2em";
+    removeBtn.style.cursor = "pointer";
+    removeBtn.onclick = () => {
+      wrapper.remove();
+      updateNameInputs();
+    };
+    wrapper.appendChild(removeBtn);
+  }
   namesList.appendChild(wrapper);
-  input.addEventListener("input", updateNameInputs);
+  select.addEventListener("input", updateNameInputs);
+  // Immediately update all dropdowns to reflect this selection
+  updateNameInputs();
 }
 
 function updateNameInputs() {
-  const nameInputs = document.querySelectorAll(".name-input");
-  if (nameInputs.length > placesLeft) {
-    for (let i = nameInputs.length - 1; i >= placesLeft; i--) {
-      nameInputs[i].parentElement.remove();
-    }
-  }
-  document.querySelectorAll(".remove-name-btn").forEach((btn) => btn.remove());
-  nameInputs.forEach((input, i) => {
-    if (i > 0) {
-      if (
-        !input.nextSibling ||
-        !input.nextSibling.classList ||
-        !input.nextSibling.classList.contains("remove-name-btn")
-      ) {
-        const removeBtn = document.createElement("button");
-        removeBtn.type = "button";
-        removeBtn.textContent = "✕";
-        removeBtn.className = "remove-name-btn";
-        removeBtn.style.marginLeft = "8px";
-        removeBtn.onclick = () => {
-          input.parentElement.remove();
-          updateNameInputs();
-        };
-        input.after(removeBtn);
-      }
+  const nameInputs = Array.from(document.querySelectorAll(".name-input"));
+  // Get all selected values
+  const selectedNames = nameInputs.map((input) => input.value).filter((n) => n);
+  const group = selectedSlot ? selectedSlot.time_group : null;
+  const usedInGroup =
+    group && userNamesUsedByGroup[group]
+      ? Array.from(userNamesUsedByGroup[group])
+      : [];
+  // For each select, update its options to exclude already selected names in other selects and already used in group
+  nameInputs.forEach((select, idx) => {
+    const currentValue = select.value;
+    // Save scroll position and focus
+    const isFocused = document.activeElement === select;
+    const scrollTop = select.scrollTop;
+    // Remove all options
+    while (select.firstChild) select.removeChild(select.firstChild);
+    // Build available options: all userNamesOptions except those selected in other selects and already used in group
+    const available = userNamesOptions.filter((name) => {
+      // Allow the current select to keep its value
+      return (
+        (!selectedNames.includes(name) || name === currentValue) &&
+        !usedInGroup.includes(name)
+      );
+    });
+    available.forEach((name) => {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      if (name === currentValue) option.selected = true;
+      select.appendChild(option);
+    });
+    // Restore focus and scroll
+    if (isFocused) {
+      select.focus();
+      select.scrollTop = scrollTop;
     }
   });
-  addNameBtn.style.display = nameInputs.length < placesLeft ? "block" : "none";
-  const atLeastOne = Array.from(nameInputs).some((input) => input.value.trim());
+  // Hide addNameBtn if all names are used
+  if (
+    nameInputs.length + (usedInGroup ? usedInGroup.length : 0) >=
+    userNamesOptions.length
+  ) {
+    addNameBtn.style.display = "none";
+  } else {
+    addNameBtn.style.display = "block";
+  }
+  const atLeastOne = nameInputs.some((input) => input.value.trim());
   submitBtn.style.display = atLeastOne ? "block" : "none";
 }
 
@@ -205,20 +304,33 @@ form.addEventListener("submit", async (e) => {
   feedback.className = "feedback";
   const user = window.nahalalSession.getSession();
   if (!selectedSlot) {
-    feedback.textContent = "Please select a time slot.";
+    feedback.textContent = i18n.pleaseSelectTimeSlot;
     feedback.className = "feedback error";
     return;
   }
+  const group = selectedSlot ? selectedSlot.time_group : null;
+  const usedInGroup =
+    group && userNamesUsedByGroup[group]
+      ? Array.from(userNamesUsedByGroup[group])
+      : [];
   const names = Array.from(document.querySelectorAll(".name-input"))
-    .map((input) => input.value.trim())
+    .map((select) => select.value.trim())
     .filter((n) => n);
   if (!names.length) {
-    feedback.textContent = "Please enter at least one name.";
+    feedback.textContent = i18n.pleaseSelectAtLeastOneName;
     feedback.className = "feedback error";
     return;
   }
+  // Check for duplicate names in the group
+  for (const n of names) {
+    if (usedInGroup.includes(n)) {
+      feedback.textContent = i18n.nameAlreadyUsed(n);
+      feedback.className = "feedback error";
+      return;
+    }
+  }
   if (names.length > placesLeft) {
-    feedback.textContent = `You can only register up to ${placesLeft} people for this slot.`;
+    feedback.textContent = i18n.maxPeople(placesLeft);
     feedback.className = "feedback error";
     return;
   }
@@ -229,22 +341,16 @@ form.addEventListener("submit", async (e) => {
       .update({ names, time_slot_id: selectedSlot.id })
       .eq("id", editId);
     if (error) {
-      feedback.textContent = `Error updating registration: ${error.message}`;
+      feedback.textContent = i18n.error(`עדכון הרשמה: ${error.message}`);
       feedback.className = "feedback error";
     } else {
-      feedback.textContent = "Registration updated!";
+      feedback.textContent = i18n.registrationUpdated;
       feedback.className = "feedback success";
       form.reset();
       window.location.href = "registrations.html";
     }
   } else {
-    const existingReg = userRegistrationsByGroup[selectedSlot.time_group];
-    if (existingReg) {
-      feedback.textContent =
-        "You already have a registration for this time group.";
-      feedback.className = "feedback error";
-      return;
-    }
+    // No longer block if user already has a registration in this group
     const { error } = await supabase.from("registrations").insert([
       {
         user_id: user.id,
@@ -253,10 +359,10 @@ form.addEventListener("submit", async (e) => {
       },
     ]);
     if (error) {
-      feedback.textContent = `Error: ${error.message}`;
+      feedback.textContent = i18n.error(error.message);
       feedback.className = "feedback error";
     } else {
-      feedback.textContent = "Registration successful!";
+      feedback.textContent = i18n.registrationSuccess;
       feedback.className = "feedback success";
       form.reset();
       window.location.href = "registrations.html";
@@ -267,3 +373,9 @@ form.addEventListener("submit", async (e) => {
 if (!window.nahalalSession.isLoggedIn()) {
   window.location.href = "login.html";
 }
+
+// Ensure slots and registrations are loaded on page load
+loadSlotsAndRegistrations();
+
+// On page load, set userNamesOptions
+userNamesOptions = getUserNames();

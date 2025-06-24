@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | Nahalal Pool Registration</title>
+    <title>כניסה | רישום לבריכת נהלל</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body class="bg-gray-100 text-gray-900 min-h-screen">
@@ -12,10 +12,10 @@
         id="login-title"
         class="text-2xl font-bold text-blue-600 text-center mb-8"
       >
-        Login
+        כניסה
       </h2>
       <form id="regular-login-form" class="mb-6 space-y-2">
-        <label for="regular-email" class="block font-medium">Email</label>
+        <label for="regular-email" class="block font-medium">אימייל</label>
         <input
           type="email"
           id="regular-email"
@@ -26,7 +26,7 @@
           type="submit"
           class="w-full py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition"
         >
-          Login as Regular User
+          כניסה כמשתמש רגיל
         </button>
         <div
           class="error text-red-600 text-center font-semibold"
@@ -35,7 +35,7 @@
       </form>
       <form id="admin-login-form" style="display: none" class="mb-6 space-y-2">
         <label for="admin-username" class="block font-medium"
-          >Admin Username</label
+          >שם משתמש מנהל</label
         >
         <input
           type="text"
@@ -43,7 +43,7 @@
           required
           class="w-full border border-gray-300 rounded-md p-2"
         />
-        <label for="admin-password" class="block font-medium">Password</label>
+        <label for="admin-password" class="block font-medium">סיסמה</label>
         <input
           type="password"
           id="admin-password"
@@ -54,7 +54,7 @@
           type="submit"
           class="w-full py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition"
         >
-          Login as Admin
+          כניסה כמנהל
         </button>
         <div
           class="error text-red-600 text-center font-semibold"
@@ -63,18 +63,18 @@
       </form>
       <div class="switch text-center mt-2">
         <span id="switch-to-admin"
-          >Admin?
-          <a class="text-blue-600 underline cursor-pointer">Login here</a></span
+          >מנהל?
+          <a class="text-blue-600 underline cursor-pointer">התחבר כאן</a></span
         >
         <span id="switch-to-regular" style="display: none"
-          >Regular user?
-          <a class="text-blue-600 underline cursor-pointer">Login here</a></span
+          >משתמש רגיל?
+          <a class="text-blue-600 underline cursor-pointer">התחבר כאן</a></span
         >
       </div>
     </div>
     <div class="text-center mt-6">
       <a href="../index.html" class="text-blue-600 hover:underline"
-        >Back to App Entry</a
+        >חזרה להתנתקות</a
       >
     </div>
     <script src="../vendor/supabase.js"></script>

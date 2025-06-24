@@ -1,8 +1,6 @@
 // Placeholder: Handle CSV upload, user creation, and display users
 const csvForm = document.getElementById("csv-upload-form");
 const csvFeedback = document.getElementById("csv-feedback");
-const userForm = document.getElementById("user-form");
-const userFeedback = document.getElementById("user-feedback");
 const tableContainer = document.getElementById("users-table-container");
 
 // Session and admin check using custom session
@@ -15,86 +13,67 @@ if (!window.nahalalSession.isLoggedIn()) {
   // User management logic can use user info here
 }
 
+// i18n: Hebrew translations
+const i18n = {
+  uploadUsers: "העלאת משתמשים (CSV)",
+  addUser: "הוסף משתמש",
+  errorLoadingUsers: "שגיאה בטעינת משתמשים",
+  userAdded: "משתמש נוסף בהצלחה",
+  noUsersFound: "לא נמצאו משתמשים",
+  action: "פעולה",
+  email: "אימייל",
+  names: "שמות",
+  role: "תפקיד",
+  remove: "הסר",
+  error: (msg) => `שגיאה: ${msg}`,
+};
+
 // Fetch and render all users
 async function fetchUsers() {
   const { data, error } = await supabase
     .from("users")
-    .select("id, email, name, role")
+    .select("id, email, name, role, names")
     .order("email", { ascending: true });
   if (error) {
-    tableContainer.innerHTML = `<p class='error'>Error loading users: ${error.message}</p>`;
+    tableContainer.innerHTML = `<p class='error'>${i18n.errorLoadingUsers}: ${error.message}</p>`;
     return;
   }
   renderTable(data || []);
 }
 
-userForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  window.nahalalUtils.setFeedback(userFeedback, "");
-  const email = document.getElementById("user-email").value.trim();
-  const name = document.getElementById("user-name").value.trim();
-  const role = document.getElementById("user-role").value;
-  let password = null;
-  if (role === "admin") {
-    password = prompt("Set a password for this admin user:");
-    if (!password) {
-      window.nahalalUtils.setFeedback(
-        userFeedback,
-        "Password required for admin user.",
-        true
-      );
-      return;
-    }
-    password = await window.nahalalUtils.sha256(password);
-  }
-  const { error } = await supabase
-    .from("users")
-    .insert([{ email, name, role, password }]);
-  if (error) {
-    window.nahalalUtils.setFeedback(
-      userFeedback,
-      `Error: ${error.message}`,
-      true
-    );
-  } else {
-    window.nahalalUtils.setFeedback(userFeedback, "User added!", false);
-    userForm.reset();
-    fetchUsers();
-  }
-});
-
 function setUserFeedback(msg, isError) {
-  window.nahalalUtils.setFeedback(userFeedback, msg, isError);
+  window.nahalalUtils.setFeedback(csvFeedback, msg, isError);
 }
 
 function renderTable(users) {
   if (!users.length) {
-    tableContainer.innerHTML = "<p>No users found.</p>";
+    tableContainer.innerHTML = `<p>${i18n.noUsersFound}</p>`;
     return;
   }
-  let html =
-    "<table><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Actions</th></tr></thead><tbody>";
+  let html = `<div class='overflow-x-auto w-full'>
+      <table class='min-w-full table-auto border-separate border-spacing-x-4 border-spacing-y-2 bg-white rounded shadow'>
+        <thead>
+          <tr>
+            <th class='px-6 py-3 text-left border-b'>${i18n.email}</th>
+            <th class='px-6 py-3 text-left border-b'>${i18n.names}</th>
+            <th class='px-6 py-3 text-left border-b'>${i18n.role}</th>
+            <th class='px-6 py-3 text-left border-b'>${i18n.action}</th>
+          </tr>
+        </thead>
+        <tbody>`;
   users.forEach((user) => {
     html += `<tr>
-      <td>${user.email}</td>
-      <td>${user.name}</td>
-      <td>
-        <select class="role-select" data-id="${user.id}">
-          <option value="regular"${
-            user.role === "regular" ? " selected" : ""
-          }>Regular</option>
-          <option value="admin"${
-            user.role === "admin" ? " selected" : ""
-          }>Admin</option>
-        </select>
-      </td>
-      <td>
-        <button class="action-btn save" data-id="${user.id}">Save</button>
-        <button class="action-btn delete" data-id="${user.id}">Delete</button>
+      <td class='px-6 py-3 border-b'>${user.email}</td>
+      <td class='px-6 py-3 border-b'>${user.names ? user.names : ""}</td>
+      <td class='px-6 py-3 border-b'>${user.role}</td>
+      <td class='px-6 py-3 border-b'>
+        <button class="action-btn delete bg-red-600 text-white rounded px-3 py-1 hover:bg-red-700 transition" data-id="${
+          user.id
+        }">${i18n.remove}</button>
       </td>
     </tr>`;
   });
-  html += "</tbody></table>";
+  html += "</tbody></table></div>";
   tableContainer.innerHTML = html;
   addUserTableListeners();
 }
@@ -119,13 +98,13 @@ function addUserTableListeners() {
   });
   document.querySelectorAll(".delete").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      if (confirm("Delete this user?")) {
+      if (confirm("האם למחוק את המשתמש?")) {
         const id = btn.getAttribute("data-id");
         const { error } = await supabase.from("users").delete().eq("id", id);
         if (error) {
-          setUserFeedback(`Error: ${error.message}`, true);
+          setUserFeedback(i18n.error(error.message), true);
         } else {
-          setUserFeedback("User deleted.", false);
+          setUserFeedback("משתמש נמחק.", false);
           fetchUsers();
         }
       }
@@ -133,6 +112,47 @@ function addUserTableListeners() {
   });
 }
 
-// TODO: Implement CSV upload logic
+// CSV upload logic for users
+csvForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  setUserFeedback("", false);
+  const fileInput = document.getElementById("csv-upload");
+  const file = fileInput.files[0];
+  if (!file) {
+    setUserFeedback("יש לבחור קובץ CSV.", true);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const text = event.target.result;
+    const lines = text.split(/\r?\n/).filter((line) => line.trim());
+    if (!lines.length) {
+      setUserFeedback("קובץ ה-CSV ריק.", true);
+      return;
+    }
+    const users = [];
+    for (const line of lines) {
+      const cols = line.split(",").map((col) => col.trim());
+      if (cols.length < 3) continue; // Need at least email, first, last
+      const email = cols[0];
+      const name = cols[1] + " " + cols[2];
+      const names = cols.slice(3).filter((n) => n);
+      users.push({ email, name, role: "regular", names });
+    }
+    if (!users.length) {
+      setUserFeedback("לא נמצאו משתמשים תקינים בקובץ.", true);
+      return;
+    }
+    const { error } = await supabase.from("users").insert(users);
+    if (error) {
+      setUserFeedback(i18n.error(error.message), true);
+    } else {
+      setUserFeedback("משתמשים הועלו בהצלחה!", false);
+      fetchUsers();
+      fileInput.value = "";
+    }
+  };
+  reader.readAsText(file);
+});
 
 fetchUsers();

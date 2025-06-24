@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manage User List | Nahalal Pool Registration</title>
+    <title>ניהול משתמשים | רישום לבריכת נהלל</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body class="bg-gray-100 text-gray-900 min-h-screen">
     <div class="max-w-4xl mx-auto my-16 bg-white rounded-lg shadow-md p-9">
       <h2 class="text-2xl font-bold text-orange-600 text-center mb-8">
-        Manage User List
+        ניהול משתמשים
       </h2>
       <form id="csv-upload-form" class="mb-8 space-y-2">
         <label for="csv-upload" class="block font-medium"
-          >Upload Users (CSV)</label
+          >העלאת משתמשים (CSV)</label
         >
         <input
           type="file"
@@ -25,55 +25,21 @@
           type="submit"
           class="bg-orange-600 text-white rounded-md px-4 py-2 hover:bg-orange-700 transition"
         >
-          Upload CSV
+          העלה CSV
         </button>
         <div
           class="feedback text-center font-bold mt-2"
           id="csv-feedback"
         ></div>
       </form>
-      <form id="user-form" class="mb-8 space-y-2">
-        <label for="user-email" class="block font-medium">Email</label>
-        <input
-          type="email"
-          id="user-email"
-          required
-          class="w-full border border-gray-300 rounded-md p-2"
-        />
-        <label for="user-name" class="block font-medium">Name</label>
-        <input
-          type="text"
-          id="user-name"
-          required
-          class="w-full border border-gray-300 rounded-md p-2"
-        />
-        <label for="user-role" class="block font-medium">Role</label>
-        <select
-          id="user-role"
-          class="w-full border border-gray-300 rounded-md p-2"
-        >
-          <option value="regular">Regular</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button
-          type="submit"
-          class="bg-orange-600 text-white rounded-md px-4 py-2 hover:bg-orange-700 transition"
-        >
-          Add User
-        </button>
-        <div
-          class="feedback text-center font-bold mt-2"
-          id="user-feedback"
-        ></div>
-      </form>
       <div id="users-table-container"></div>
       <div class="text-center mt-6">
         <a href="admin.html" class="text-orange-600 hover:underline"
-          >Back to Admin Home</a
+          >חזרה לאזור ניהול</a
         >
         <span class="mx-2">|</span>
         <a href="../index.html" class="text-orange-600 hover:underline"
-          >App Entry</a
+          >התנתקות</a
         >
       </div>
     </div>

@@ -18,6 +18,15 @@ if (!window.nahalalSession.isLoggedIn()) {
 let lastRegistrations = [];
 let lastDuplicates = [];
 
+// i18n: Hebrew translations
+const i18n = {
+  exportCSV: "ייצוא ל-CSV",
+  noDuplicates: "אין כפילויות לייצוא",
+  noRegistrations: "אין הרשמות לייצוא",
+  errorLoadingRegistrations: "שגיאה בטעינת הרשמות",
+  error: (msg) => `שגיאה: ${msg}`,
+};
+
 function arrayToCSV(arr, columns) {
   return window.nahalalUtils.arrayToCSV(arr, columns);
 }
@@ -34,7 +43,7 @@ document
   .getElementById("export-registrations-btn")
   .addEventListener("click", () => {
     if (!lastRegistrations.length) {
-      setFeedback("No registrations to export.", true);
+      setFeedback(i18n.noRegistrations, true);
       return;
     }
     const columns = [
@@ -55,7 +64,7 @@ document
   .getElementById("export-duplicates-btn")
   .addEventListener("click", () => {
     if (!lastDuplicates.length) {
-      setFeedback("No duplicates to export.", true);
+      setFeedback(i18n.noDuplicates, true);
       return;
     }
     const columns = ["name", "email", "time_group", "count"];
@@ -114,7 +123,7 @@ async function fetchAndRenderReports() {
       `id, names, user_id, time_slot_id, users:user_id(name, email), time_slots:time_slot_id(date, start_time, end_time, time_group)`
     );
   if (regsError) {
-    setFeedback(`Error loading registrations: ${regsError.message}`, true);
+    setFeedback(i18n.errorLoadingRegistrations, true);
     registrationsTable.innerHTML = "";
     duplicatesTable.innerHTML = "";
     return;

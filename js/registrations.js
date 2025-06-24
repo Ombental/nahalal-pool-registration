@@ -10,6 +10,21 @@ if (!window.nahalalSession.isLoggedIn()) {
   // Registration list logic can use user info here
 }
 
+// i18n: Hebrew translations
+const i18n = {
+  date: "תאריך",
+  time: "שעה",
+  timeGroup: "קבוצה",
+  names: "שמות",
+  status: "סטטוס",
+  action: "פעולה",
+  upcoming: "קרוב",
+  past: "עבר",
+  cancel: "ביטול",
+  noRegistrations: "לא נמצאו הרשמות",
+  remove: "הסר",
+};
+
 async function fetchAndRenderRegistrations() {
   const user = window.nahalalSession.getSession();
   if (!user) return;
@@ -59,41 +74,60 @@ async function fetchAndRenderRegistrations() {
 
 function renderTable(registrations) {
   if (!registrations.length) {
-    tableContainer.innerHTML = "<p>No registrations found.</p>";
+    tableContainer.innerHTML = `<p>${i18n.noRegistrations}</p>`;
     return;
   }
-  let html =
-    "<table><thead><tr><th>Date</th><th>Time</th><th>Time Group</th><th>Names</th><th>Status</th><th>Action</th></tr></thead><tbody>";
+  let html = `<div class='overflow-x-auto w-full'>
+      <table class='min-w-full table-auto border-separate border-spacing-x-4 border-spacing-y-2 bg-white rounded shadow'>
+        <thead>
+          <tr>
+            <th class='px-6 py-3 text-left border-b'>${i18n.date}</th>
+            <th class='px-6 py-3 text-left border-b'>${i18n.time}</th>
+            <th class='px-6 py-3 text-left border-b'>${i18n.timeGroup}</th>
+            <th class='px-6 py-3 text-left border-b'>${i18n.names}</th>
+            <th class='px-6 py-3 text-left border-b'>${i18n.status}</th>
+            <th class='px-6 py-3 text-left border-b'>${i18n.action}</th>
+          </tr>
+        </thead>
+        <tbody>`;
   registrations.forEach((reg) => {
     const isFuture = reg.isFuture;
     const namesCellId = `names-cell-${reg.id}`;
     html += `<tr>
-      <td>${reg.date || "-"}</td>
-      <td>${
+      <td class='px-6 py-3 border-b'>${reg.date || "-"}</td>
+      <td class='px-6 py-3 border-b'>${
         reg.start_time && reg.end_time
           ? reg.start_time + " - " + reg.end_time
           : "-"
       }</td>
-      <td>${reg.time_group || "-"}</td>
-      <td id="${namesCellId}">${reg.names.join(", ")}${
-      isFuture
-        ? ' <button class="edit-names-btn" data-id="' +
-          reg.id +
-          '" title="Edit names" style="background:none;border:none;cursor:pointer;padding:0;vertical-align:middle;"><span style="font-size:1.1em;">✏️</span></button>'
-        : ""
-    }</td>
-      <td>${isFuture ? "Upcoming" : "Past"}</td>
-      <td>${
+      <td class='px-6 py-3 border-b'>${reg.time_group || "-"}</td>
+      <td class='px-6 py-3 border-b' id='${namesCellId}'><div class='flex flex-wrap gap-2'>${reg.names
+      .map((name, i) => {
+        if (isFuture) {
+          return `<span class='chip inline-flex items-center rounded-full bg-blue-100 text-blue-800 px-3 py-1 text-sm font-medium mb-1'>${name}${
+            reg.names.length > 1
+              ? `<button class='remove-name-btn ml-2 text-blue-500 hover:text-red-600' data-regid='${reg.id}' data-name-idx='${i}' title='${i18n.remove}' style='background:none;border:none;font-size:1em;cursor:pointer;'>&times;</button>`
+              : ""
+          }</span>`;
+        } else {
+          return `<span class='chip inline-flex items-center rounded-full bg-gray-200 text-gray-700 px-3 py-1 text-sm font-medium mb-1'>${name}</span>`;
+        }
+      })
+      .join("")}</div></td>
+      <td class='px-6 py-3 border-b'>${
+        isFuture ? i18n.upcoming : i18n.past
+      }</td>
+      <td class='px-6 py-3 border-b'>${
         isFuture
-          ? `<button class="cancel-btn" data-id="${reg.id}">Cancel</button>`
+          ? `<button class=\"cancel-btn bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded\" data-id=\"${reg.id}\">${i18n.cancel}</button>`
           : ""
       }</td>
     </tr>`;
   });
-  html += "</tbody></table>";
+  html += "</tbody></table></div>";
   tableContainer.innerHTML = html;
   addCancelListeners(registrations);
-  addEditListeners(registrations);
+  addRemoveNameListeners(registrations);
 }
 
 function addCancelListeners(registrations) {
@@ -124,107 +158,48 @@ function addCancelListeners(registrations) {
   });
 }
 
-function addEditListeners(registrations) {
-  document.querySelectorAll(".edit-names-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const regId = btn.getAttribute("data-id");
-      const reg = registrations.find((r) => r.id === regId);
-      const cell = document.getElementById(`names-cell-${regId}`);
-      if (!cell) return;
-      renderEditNamesCell(cell, reg, registrations);
-    });
-  });
-}
-
-function renderEditNamesCell(cell, reg, registrations) {
-  let inputsHtml = "";
-  (reg.names || []).forEach((name, i) => {
-    inputsHtml += `<div style='display:flex;align-items:center;margin-bottom:2px;'><input type='text' class='edit-name-input' value="${name.replace(
-      /"/g,
-      "&quot;"
-    )}" style='margin-right:6px;'/>${
-      reg.names.length > 1
-        ? `<button type='button' class='remove-name-btn' data-idx='${i}' style='background:none;border:none;color:#d32f2f;font-size:1.1em;cursor:pointer;'>✕</button>`
-        : ""
-    }</div>`;
-  });
-  if (!reg.names.length) {
-    inputsHtml += `<div style='display:flex;align-items:center;margin-bottom:2px;'><input type='text' class='edit-name-input' value="" style='margin-right:6px;'/></div>`;
-  }
-  inputsHtml += `<button type='button' class='add-name-btn' style='background:none;border:none;color:#2a7ae2;font-size:1.1em;cursor:pointer;margin-top:2px;'>+ Add Name</button>`;
-  inputsHtml += `<div style='margin-top:6px;'><button type='button' class='save-names-btn' style='background:#2a7ae2;color:#fff;border:none;border-radius:4px;padding:4px 10px;margin-right:6px;'>Save</button><button type='button' class='cancel-edit-btn' style='background:#bbb;color:#222;border:none;border-radius:4px;padding:4px 10px;'>Cancel</button></div>`;
-  cell.innerHTML = inputsHtml;
-  addEditNamesHandlers(cell, reg, registrations);
-}
-
-function addEditNamesHandlers(cell, reg, registrations) {
-  cell.querySelector(".add-name-btn").onclick = () => {
-    const div = document.createElement("div");
-    div.style.display = "flex";
-    div.style.alignItems = "center";
-    div.style.marginBottom = "2px";
-    const input = document.createElement("input");
-    input.type = "text";
-    input.className = "edit-name-input";
-    input.style.marginRight = "6px";
-    if (cell.querySelectorAll(".edit-name-input").length >= 1) {
-      const removeBtn = document.createElement("button");
-      removeBtn.type = "button";
-      removeBtn.className = "remove-name-btn";
-      removeBtn.innerHTML = "✕";
-      removeBtn.style.background = "none";
-      removeBtn.style.border = "none";
-      removeBtn.style.color = "#d32f2f";
-      removeBtn.style.fontSize = "1.1em";
-      removeBtn.style.cursor = "pointer";
-      removeBtn.onclick = () => {
-        if (cell.querySelectorAll(".edit-name-input").length > 1) div.remove();
-      };
-      div.appendChild(input);
-      div.appendChild(removeBtn);
-    } else {
-      div.appendChild(input);
-    }
-    cell.insertBefore(div, cell.querySelector(".add-name-btn"));
-  };
-  cell.querySelectorAll(".remove-name-btn").forEach((btn) => {
-    btn.onclick = () => {
-      if (cell.querySelectorAll(".edit-name-input").length > 1)
-        btn.parentElement.remove();
+function addRemoveNameListeners(registrations) {
+  document.querySelectorAll(".remove-name-btn").forEach((btn) => {
+    btn.onclick = async () => {
+      const regId = btn.getAttribute("data-regid");
+      const nameIdx = parseInt(btn.getAttribute("data-name-idx"), 10);
+      const reg = registrations.find((r) => r.id == regId);
+      if (!reg) return;
+      const newNames = reg.names.slice();
+      newNames.splice(nameIdx, 1);
+      if (newNames.length > 0) {
+        // Update registration
+        const { error } = await supabase
+          .from("registrations")
+          .update({ names: newNames })
+          .eq("id", regId);
+        if (error) {
+          window.nahalalUtils.setFeedback(
+            feedback,
+            `Error updating registration: ${error.message}`,
+            true
+          );
+        } else {
+          fetchAndRenderRegistrations();
+        }
+      } else {
+        // Delete registration
+        const { error } = await supabase
+          .from("registrations")
+          .delete()
+          .eq("id", regId);
+        if (error) {
+          window.nahalalUtils.setFeedback(
+            feedback,
+            `Error deleting registration: ${error.message}`,
+            true
+          );
+        } else {
+          fetchAndRenderRegistrations();
+        }
+      }
     };
   });
-  cell.querySelector(".cancel-edit-btn").onclick = () => {
-    renderTable(registrations);
-  };
-  cell.querySelector(".save-names-btn").onclick = async () => {
-    const nameInputs = cell.querySelectorAll(".edit-name-input");
-    const names = Array.from(nameInputs)
-      .map((input) => input.value.trim())
-      .filter((n) => n);
-    if (!names.length) {
-      window.nahalalUtils.setFeedback(
-        feedback,
-        "Please enter at least one name.",
-        true
-      );
-      return;
-    }
-    // Update registration
-    const { error } = await supabase
-      .from("registrations")
-      .update({ names })
-      .eq("id", reg.id);
-    if (error) {
-      window.nahalalUtils.setFeedback(
-        feedback,
-        `Error updating registration: ${error.message}`,
-        true
-      );
-    } else {
-      window.nahalalUtils.setFeedback(feedback, "Registration updated!", false);
-      fetchAndRenderRegistrations();
-    }
-  };
 }
 
 // On page load, fetch and render

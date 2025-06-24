@@ -9,6 +9,7 @@
 - name (text)
 - role (enum: 'admin', 'regular')
 - password (text, nullable for regular users)
+- names (text[], array of names for regular users, nullable)
 - created_at (timestamp)
 
 ### time_slots
@@ -41,5 +42,6 @@
 
 - Admins are identified by role in users table and have a password
 - Regular users are uploaded/managed by admin; password is null for them
+- Each user (regular) can have a list of names (text array, nullable)
 - Each registration can include a list of names (text array) for additional people
 - Supabase Row Level Security (RLS) should enforce registration and viewing permissions

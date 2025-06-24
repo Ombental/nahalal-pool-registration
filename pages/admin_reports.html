@@ -1,46 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Reports | Nahalal Pool Registration</title>
+    <title>דוחות ניהול | רישום לבריכת נהלל</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body class="bg-gray-100 text-gray-900 min-h-screen">
     <div class="max-w-4xl mx-auto my-16 bg-white rounded-lg shadow-md p-9">
       <h2 class="text-2xl font-bold text-orange-600 text-center mb-8">
-        Admin Reports
+        דוחות ניהול
       </h2>
       <div class="mb-10">
-        <h3 class="text-lg font-semibold mb-2">All Current Registrations</h3>
+        <h3 class="text-lg font-semibold mb-2">כל ההרשמות הנוכחיות</h3>
         <button
           id="export-registrations-btn"
           class="bg-orange-600 text-white rounded-md px-4 py-2 mb-3 hover:bg-orange-700 transition"
         >
-          Export as CSV
+          ייצוא ל-CSV
         </button>
         <div id="registrations-table-container"></div>
       </div>
       <div class="mb-10">
         <h3 class="text-lg font-semibold mb-2">
-          Users Registered Twice in the Same Time Group
+          משתמשים שנרשמו פעמיים לאותה קבוצה
         </h3>
         <button
           id="export-duplicates-btn"
           class="bg-orange-600 text-white rounded-md px-4 py-2 mb-3 hover:bg-orange-700 transition"
         >
-          Export as CSV
+          ייצוא ל-CSV
         </button>
         <div id="duplicates-table-container"></div>
       </div>
       <div class="feedback text-center font-bold mt-4" id="feedback"></div>
       <div class="text-center mt-6">
         <a href="admin.html" class="text-orange-600 hover:underline"
-          >Back to Admin Home</a
+          >חזרה לאזור ניהול</a
         >
         <span class="mx-2">|</span>
         <a href="../index.html" class="text-orange-600 hover:underline"
-          >App Entry</a
+          >התנתקות</a
         >
       </div>
     </div>

@@ -7,6 +7,14 @@ const switchToRegular = document.getElementById("switch-to-regular");
 // Import shared Supabase client
 // Assumes supabaseClient.js is loaded before this script
 
+// i18n: Hebrew translations
+const i18n = {
+  login: "כניסה",
+  email: "אימייל",
+  loginAsRegular: "כניסה כמשתמש רגיל",
+  error: (msg) => `שגיאה: ${msg}`,
+};
+
 switchToAdmin.addEventListener("click", () => {
   regularForm.style.display = "none";
   adminForm.style.display = "block";
