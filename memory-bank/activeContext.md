@@ -21,8 +21,51 @@
 
 ## Current Focus
 
-- Codebase refactor for maintainability and DRY principles.
-- Extraction of common JS utilities into a single module.
+**Summery Pool Vibe UI Overhaul**
+
+### Design Goals
+
+- Color Palette: Pool blues (gradient backgrounds, buttons), sunny yellows (accents, highlights).
+- Imagery: Pool, water, sun, floaties, beach balls, waves, etc.
+- Icons: Use SVGs or icon fonts for water, sun, swimmers, etc.
+- Backgrounds: Subtle pool/wave patterns, floating icons, or soft gradients.
+- Typography: Friendly, rounded, summery font (e.g., Google Fonts "Varela Round" or similar).
+- Component Polish: Buttons, cards, tables, and forms should feel "summery" and inviting.
+
+### Implementation Plan
+
+#### A. Global Styles
+
+- Add/override Tailwind config or custom CSS for blue gradients and yellow accents.
+- Set a background gradient for the body (e.g., light blue to deeper blue).
+- Add floating SVG icons/images (e.g., floaties, waves, sun) as background elements (absolute/fixed, low opacity).
+
+#### B. Layout & Components
+
+- Headers: Add a pool/sun icon next to main titles.
+- Buttons: Use blue/yellow gradients, rounded, with subtle shadow.
+- Cards/Forms: Add soft blue backgrounds, maybe a "pool tile" pattern or wave border.
+- Tables: Blue header rows, yellow highlights for important actions.
+
+#### C. Imagery & Icons
+
+- Use SVGs for pool/summer icons (sun, waves, floaties, etc.).
+- Place icons in corners/backgrounds, and next to relevant text (e.g., sun by logout, swimmer by registration).
+- Consider a subtle animated wave or floating effect for background icons.
+
+#### D. Polish
+
+- Add hover/active effects with yellow highlights.
+- Use a friendly, rounded font for all text.
+- Ensure all changes are RTL-friendly and mobile responsive.
+
+### Execution Steps
+
+1. Add/Update Global CSS: gradients, backgrounds, icon placement, summery font.
+2. Update HTML Layouts: background divs for floating icons/SVGs, icons in headers and buttons.
+3. Update Component Styles: buttons, cards, tables, forms with new color scheme and rounded corners.
+4. Test Responsiveness & RTL.
+5. (Optional) Add subtle animations: floating icons, wave movement, button hover effects.
 
 ## Current State
 

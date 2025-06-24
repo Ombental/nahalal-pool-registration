@@ -4,10 +4,64 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ניהול משתמשים | רישום לבריכת נהלל</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap"
+      rel="stylesheet"
+    />
+    <link href="../css/pool-theme.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body class="bg-gray-100 text-gray-900 min-h-screen">
-    <div class="max-w-4xl mx-auto my-16 bg-white rounded-lg shadow-md p-9">
+    <div
+      class="max-w-4xl mx-auto my-16 bg-white rounded-lg shadow-md p-9"
+      style="position: relative; overflow: hidden"
+    >
+      <!-- Floating SVG icons for summery pool vibe -->
+      <svg
+        class="floating-icon top-right"
+        width="64"
+        height="64"
+        viewBox="0 0 64 64"
+        fill="none"
+      >
+        <circle
+          cx="32"
+          cy="32"
+          r="24"
+          fill="#ffe066"
+          stroke="#ffb300"
+          stroke-width="4"
+        />
+        <circle cx="32" cy="32" r="12" fill="#fffde4" />
+      </svg>
+      <svg
+        class="floating-icon bottom-left"
+        width="64"
+        height="64"
+        viewBox="0 0 64 64"
+        fill="none"
+      >
+        <ellipse cx="32" cy="48" rx="20" ry="8" fill="#4fc3f7" />
+        <ellipse cx="32" cy="48" rx="12" ry="4" fill="#b2eaff" />
+        <circle
+          cx="32"
+          cy="48"
+          r="8"
+          fill="#ffe066"
+          stroke="#ffb300"
+          stroke-width="2"
+        />
+      </svg>
+      <svg
+        class="floating-icon bottom-right"
+        width="80"
+        height="32"
+        viewBox="0 0 80 32"
+        fill="none"
+      >
+        <path d="M0 24 Q 20 8 40 24 T 80 24 V32 H0Z" fill="#b2eaff" />
+        <path d="M0 28 Q 20 16 40 28 T 80 28 V32 H0Z" fill="#4fc3f7" />
+      </svg>
       <h2 class="text-2xl font-bold text-orange-600 text-center mb-8">
         ניהול משתמשים
       </h2>

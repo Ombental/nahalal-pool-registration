@@ -100,6 +100,7 @@ function populateDateDropdown() {
   dateSelect.innerHTML = `<option value="">${i18n.selectDateOption}</option>`;
   feedback.textContent = "";
   form.style.display = "block";
+  let noDates = true;
   uniqueDates.forEach((date) => {
     // Only include dates with at least one slot that is not in a full group
     const slotsForDate = slotsByDate[date].filter((slot) => {
@@ -117,14 +118,15 @@ function populateDateDropdown() {
         month: "2-digit",
       });
       dateSelect.innerHTML += `<option value="${date}">${dayName} ${dayMonth}</option>`;
-    } else {
-      dateSelect.innerHTML = `<option value="">${i18n.noAvailableDates}</option>`;
-      // Show message if user has registered to everything possible
-      feedback.textContent = i18n.allRegistered;
-      feedback.className = "feedback success";
-      return;
+      noDates = false;
     }
   });
+  if (noDates) {
+    dateSelect.innerHTML = `<option value="">${i18n.noAvailableDates}</option>`;
+    // Show message if user has registered to everything possible
+    feedback.textContent = i18n.allRegistered;
+    feedback.className = "feedback success";
+  }
 }
 
 function clearNameInputs() {

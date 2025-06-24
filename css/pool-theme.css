@@ -1,0 +1,113 @@
+/* Summery Pool Vibe Theme */
+
+:root {
+  --pool-blue1: #b3d8f7;
+  --pool-blue2: #5bb0e6;
+  --pool-blue3: #1976d2;
+  --pool-blue4: #115293;
+  --pool-blue5: #0d355c;
+  --pool-yellow: #ffe066;
+  --pool-accent: #ffd600;
+}
+
+body {
+  font-family: "Varela Round", Arial, sans-serif;
+  background: linear-gradient(
+    135deg,
+    var(--pool-blue1) 0%,
+    var(--pool-blue2) 60%,
+    var(--pool-blue4) 100%
+  );
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Varela Round", Arial, sans-serif;
+  color: var(--pool-blue5);
+}
+
+button,
+.btn,
+input[type="submit"] {
+  font-family: "Varela Round", Arial, sans-serif;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--pool-blue2), var(--pool-blue3));
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+button:hover,
+.btn:hover,
+input[type="submit"]:hover {
+  background: linear-gradient(90deg, var(--pool-blue1), var(--pool-yellow));
+  color: #222;
+  box-shadow: 0 4px 16px rgba(255, 224, 102, 0.1);
+}
+
+/* Accent for important actions */
+.pool-accent {
+  color: var(--pool-accent);
+}
+
+/* Floating SVG icon utility */
+.floating-icon {
+  position: absolute;
+  z-index: 0;
+  opacity: 0.12;
+  pointer-events: none;
+  animation: floaty 6s ease-in-out infinite alternate;
+}
+@keyframes floaty {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Example: place icons in corners */
+.floating-icon.top-left {
+  top: 2vw;
+  left: 2vw;
+}
+.floating-icon.top-right {
+  top: 2vw;
+  right: 2vw;
+}
+.floating-icon.bottom-left {
+  bottom: 2vw;
+  left: 2vw;
+}
+.floating-icon.bottom-right {
+  bottom: 2vw;
+  right: 2vw;
+}
+
+/* Card/Form backgrounds */
+.bg-pool-tile {
+  background: repeating-linear-gradient(
+    135deg,
+    #e3f6fd 0 10px,
+    #b2eaff 10px 20px
+  );
+}
+
+/* Table header row */
+th {
+  background: linear-gradient(90deg, var(--pool-blue3), var(--pool-blue2));
+  color: var(--pool-blue5) !important;
+}
+
+/* Yellow highlight for important actions */
+.pool-highlight {
+  background: var(--pool-yellow) !important;
+  color: #222 !important;
+}

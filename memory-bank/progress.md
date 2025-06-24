@@ -23,6 +23,10 @@
 - Database and frontend are in sync
 - Registration form is user-friendly and prevents duplicate name selection
 - Ready for further feature requests or deployment
+- The app is fully internationalized in Hebrew and RTL.
+- All user/admin flows are functional and visually consistent.
+- The new 'Summery Pool Vibe' UI overhaul plan is now the active execution plan.
+- Next step: Implement global styles (background gradients, summery font, floating icons).
 
 ## Known Issues
 

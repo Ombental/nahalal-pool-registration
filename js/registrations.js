@@ -94,21 +94,32 @@ function renderTable(registrations) {
     const isFuture = reg.isFuture;
     const namesCellId = `names-cell-${reg.id}`;
     html += `<tr>
-      <td class='px-6 py-3 border-b'>${reg.date || "-"}</td>
+      <td class='px-6 py-3 border-b'>${
+        reg.date
+          ? (() => {
+              const days = ["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"];
+              const d = new Date(reg.date);
+              const dayName = days[d.getDay()];
+              const day = String(d.getDate()).padStart(2, "0");
+              const month = String(d.getMonth() + 1).padStart(2, "0");
+              return `יום ${dayName} ${day}.${month}`;
+            })()
+          : "-"
+      }</td>
       <td class='px-6 py-3 border-b'>${
         reg.start_time && reg.end_time
-          ? reg.start_time + " - " + reg.end_time
+          ? reg.end_time.slice(0, 5) + " - " + reg.start_time.slice(0, 5)
           : "-"
       }</td>
       <td class='px-6 py-3 border-b'>${reg.time_group || "-"}</td>
       <td class='px-6 py-3 border-b' id='${namesCellId}'><div class='flex flex-wrap gap-2'>${reg.names
       .map((name, i) => {
         if (isFuture) {
-          return `<span class='chip inline-flex items-center rounded-full bg-blue-100 text-blue-800 px-3 py-1 text-sm font-medium mb-1'>${name}${
+          const removeBtn =
             reg.names.length > 1
-              ? `<button class='remove-name-btn ml-2 text-blue-500 hover:text-red-600' data-regid='${reg.id}' data-name-idx='${i}' title='${i18n.remove}' style='background:none;border:none;font-size:1em;cursor:pointer;'>&times;</button>`
-              : ""
-          }</span>`;
+              ? `<button class='remove-name-btn font-bold' data-regid='${reg.id}' data-name-idx='${i}' title='${i18n.remove}' style='background:none;border:none;font-size:1.1em;cursor:pointer;color:#0d355c;margin-left:0.5em;margin-right:0;'>×</button>`
+              : "";
+          return `<span class='chip inline-flex items-center rounded-full bg-blue-100 text-blue-800 px-3 py-1 text-sm font-medium mb-1'>${removeBtn}${name}</span>`;
         } else {
           return `<span class='chip inline-flex items-center rounded-full bg-gray-200 text-gray-700 px-3 py-1 text-sm font-medium mb-1'>${name}</span>`;
         }

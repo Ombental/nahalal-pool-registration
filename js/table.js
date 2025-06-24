@@ -178,7 +178,7 @@ function renderTable() {
           if (isAdmin()) {
             cellHtml = `<span class='font-medium text-blue-700'>${name}${userName}</span> <button class='remove-name-btn text-red-500 ml-1' data-regid='${regId}' data-name='${encodeURIComponent(
               name
-            )}' title='Remove' style='font-size:1em;background:none;border:none;cursor:pointer;'>✕</button>`;
+            )}' title='Remove' style='font-size:1em;background:none;border:none;cursor:pointer;color:red;'>✕</button>`;
           } else {
             cellHtml = `<span class='font-medium text-blue-700'>${name}${userName}</span>`;
           }
